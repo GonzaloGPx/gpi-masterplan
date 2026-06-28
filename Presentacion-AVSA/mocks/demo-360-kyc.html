@@ -1,0 +1,295 @@
+<!DOCTYPE html><html lang="es"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>GPI · Clientes 360 · KYC — demo</title>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600&family=Inter:wght@400;500;600;700&family=Geist+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#f4f6f9;--ink:#0c1b33;--card:#fff;--line:#e6eaf0;--mut:#6b7689;--soft:#9aa6b5;
+  --acc:#0a8f5f;--accs:#e7f6ef;--blue:#2563c9;--amber:#b9770a;--ambs:#fdf6e9;--red:#d6453c;--reds:#fdeeed;--violet:#6d5bd0;--viols:#f0edfb;
+  --mono:'Geist Mono',ui-monospace,monospace;--ser:'Fraunces',Georgia,serif;--sans:'Inter',system-ui,sans-serif;
+}
+*{margin:0;padding:0;box-sizing:border-box}
+body{background:var(--bg);color:var(--ink);font-family:var(--sans);overflow:hidden;height:100vh}
+.stagewrap{position:fixed;inset:0;overflow:hidden}
+.scene{position:absolute;inset:0;opacity:0;visibility:hidden;transition:opacity .7s ease;display:flex;flex-direction:column;justify-content:center;padding:64px 80px 110px}
+.scene.active{opacity:1;visibility:visible}
+[data-anim]{opacity:0;transform:translateY(18px);transition:opacity .7s cubic-bezier(.2,.7,.2,1),transform .7s cubic-bezier(.2,.7,.2,1)}
+[data-anim].in{opacity:1;transform:none}
+.eyebrow{font-family:var(--mono);font-size:12px;letter-spacing:.18em;text-transform:uppercase;color:var(--acc);margin-bottom:18px;display:flex;gap:11px;align-items:center}
+.eyebrow::before{content:"";width:26px;height:1px;background:var(--acc)}
+h1{font-family:var(--ser);font-weight:500;letter-spacing:-.01em;line-height:1.05}
+.s-title h1{font-size:clamp(40px,5.6vw,72px);max-width:18ch}
+.s-title .sub{font-size:clamp(18px,1.9vw,23px);color:var(--mut);max-width:62ch;margin-top:24px;line-height:1.5}
+.chips{display:flex;flex-wrap:wrap;gap:10px;margin-top:40px}
+.chip{font-size:14px;background:var(--card);border:1px solid var(--line);border-radius:100px;padding:9px 16px;color:#3a4658;box-shadow:0 3px 12px -8px rgba(12,27,51,.3)}
+.chip.on{background:var(--ink);color:#fff;border-color:var(--ink)}
+.chip .d{color:var(--acc);margin-right:7px}
+/* brand corners */
+.brand{position:fixed;top:24px;left:30px;z-index:30;display:flex;align-items:center;gap:11px;font-family:var(--mono);font-size:12px;letter-spacing:.04em;color:var(--ink)}
+.brand .lg{width:28px;height:28px;border-radius:8px;background:linear-gradient(135deg,#0c1b33,#234a82);color:#fff;font-weight:700;font-size:11px;display:flex;align-items:center;justify-content:center}
+.forb{position:fixed;top:24px;right:30px;z-index:30;display:flex;align-items:center;gap:10px;font-family:var(--mono);font-size:10px;letter-spacing:.14em;color:var(--soft);text-transform:uppercase}
+.forb img{height:24px;opacity:.9}
+/* 3 pillars */
+.pillars{display:grid;grid-template-columns:repeat(3,1fr);gap:18px;margin-top:46px}
+.pil{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:24px;box-shadow:0 10px 30px -22px rgba(12,27,51,.4)}
+.pil .ic{width:42px;height:42px;border-radius:11px;display:flex;align-items:center;justify-content:center;font-size:19px;margin-bottom:16px}
+.pil h3{font-size:18px;margin-bottom:7px;font-weight:600;font-family:var(--sans)}
+.pil p{color:var(--mut);font-size:14.5px;line-height:1.5}
+/* APP CHROME */
+.app{background:var(--card);border:1px solid var(--line);border-radius:16px;box-shadow:0 26px 70px -34px rgba(12,27,51,.55);overflow:hidden;width:100%}
+.appbar{display:flex;align-items:center;gap:18px;padding:14px 20px;border-bottom:1px solid var(--line)}
+.appbar .at{font-weight:600;font-size:14.5px}.appbar .at span{color:var(--soft);font-weight:400;font-size:12.5px}
+.tabs{display:flex;gap:5px;flex-wrap:wrap;flex:1}
+.tabs b{font-size:12.5px;font-weight:500;color:var(--mut);padding:6px 11px;border-radius:8px;cursor:default}
+.tabs b.on{background:var(--ink);color:#fff}
+.tabs b.nx{color:var(--acc);background:var(--accs)}
+.beta{font-family:var(--mono);font-size:10px;letter-spacing:.1em;background:var(--ambs);color:var(--amber);border:1px solid #f0e0bf;padding:4px 9px;border-radius:6px}
+.appbody{padding:22px;display:grid;grid-template-columns:1fr 1.45fr;gap:18px}
+/* client search */
+.search{position:relative;max-width:430px}
+.searchbox{display:flex;align-items:center;gap:10px;border:1.5px solid var(--blue);border-radius:11px;padding:12px 15px;background:#fff;font-size:15px;color:var(--ink);box-shadow:0 0 0 4px rgba(37,99,201,.1)}
+.searchbox .q{color:var(--soft)}
+.dd{margin-top:8px;background:#fff;border:1px solid var(--line);border-radius:12px;box-shadow:0 24px 50px -20px rgba(12,27,51,.45);overflow:hidden}
+.dd .it{display:flex;gap:12px;padding:12px 16px;border-top:1px solid #f1f4f8;font-size:14.5px}
+.dd .it:first-child{border-top:none}
+.dd .it .id{font-family:var(--mono);color:var(--soft);font-size:13px}
+.dd .it.sel{background:var(--accs)}
+.dd .it.sel .id{color:var(--acc)}
+.dd .it.sel .nm{font-weight:600}
+/* client card */
+.ccard{background:#fbfcfe;border:1px solid var(--line);border-radius:13px;padding:18px}
+.chead{display:flex;align-items:center;gap:13px;margin-bottom:14px}
+.av{width:48px;height:48px;border-radius:50%;background:linear-gradient(135deg,#234a82,#0a8f5f);color:#fff;font-weight:600;display:flex;align-items:center;justify-content:center;font-size:16px;font-family:var(--mono)}
+.chead .nm{font-size:16px;font-weight:600}
+.chead .meta{font-family:var(--mono);font-size:11.5px;color:var(--soft)}
+.crow{display:flex;gap:8px;font-size:13px;padding:6px 0;color:#3a4658}
+.crow .k{color:var(--soft);min-width:74px}
+.sep{height:1px;background:var(--line);margin:11px 0}
+.tagrow{display:flex;flex-wrap:wrap;gap:7px;margin-top:6px}
+.tg{font-size:11.5px;background:#eef2f7;color:#48566a;border-radius:7px;padding:4px 9px}
+.tg.g{background:var(--accs);color:var(--acc)}
+.compl{font-family:var(--mono);font-size:10.5px;letter-spacing:.1em;text-transform:uppercase;color:var(--soft);margin:14px 0 7px}
+/* perfil inversor */
+.pi{background:#fffdf6;border:1px solid #f0e6cd;border-radius:13px;padding:18px}
+.pihd{font-family:var(--mono);font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:var(--amber);margin-bottom:14px;display:flex;align-items:center;gap:8px}
+.align{background:var(--reds);border:1px solid #f5c9c5;color:var(--red);border-radius:9px;padding:10px 13px;font-size:13.5px;margin-bottom:18px;display:flex;gap:9px;align-items:center;font-weight:500}
+.gauges{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:16px}
+.gauge{text-align:center}
+.gauge .gt{font-family:var(--mono);font-size:9.5px;letter-spacing:.08em;color:var(--soft);text-transform:uppercase;margin-bottom:2px}
+.garc{position:relative;width:150px;max-width:100%;margin:0 auto}
+.needle{position:absolute;left:50%;bottom:18%;width:3px;height:42%;background:#1a2435;border-radius:3px;transform-origin:bottom center;transform:rotate(-94deg);transition:transform 1.3s cubic-bezier(.2,.85,.25,1)}
+.scene.active .needle{transform:rotate(var(--rot))}
+.needle::after{content:"";position:absolute;bottom:-5px;left:50%;transform:translateX(-50%);width:11px;height:11px;border-radius:50%;background:#1a2435}
+.gval{font-size:20px;font-weight:600;margin-top:-6px}
+.glabel{font-family:var(--mono);font-size:11px;letter-spacing:.06em;font-weight:500}
+.glabel.mod{color:var(--blue)}.glabel.agr{color:var(--red)}.glabel.baj{color:var(--acc)}
+.diag{background:#f3f6fb;border-radius:9px;padding:12px 14px;font-size:13px;color:#3a4658;line-height:1.45}
+.diag .h{font-family:var(--mono);font-size:10px;letter-spacing:.12em;text-transform:uppercase;color:var(--soft);margin-bottom:6px}
+.diag .ia{color:var(--violet);font-weight:500;margin-top:8px;display:inline-block}
+/* perfil IA columns */
+.iahead{display:flex;align-items:center;justify-content:space-between;margin-bottom:18px}
+.analizing{font-family:var(--mono);font-size:12px;color:var(--violet);background:var(--viols);border:1px solid #ddd5f5;border-radius:100px;padding:7px 15px;display:inline-flex;gap:9px;align-items:center}
+.analizing .sp{width:12px;height:12px;border:2px solid #d3c9f3;border-top-color:var(--violet);border-radius:50%;animation:sp 1s linear infinite}
+@keyframes sp{to{transform:rotate(360deg)}}
+.cols{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
+.col{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:20px}
+.col .ch{font-family:var(--mono);font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--amber);border-bottom:1px solid var(--line);padding-bottom:10px;margin-bottom:14px}
+.fld{margin-bottom:13px}
+.fld .l{font-size:11.5px;color:var(--soft);margin-bottom:2px}
+.fld .v{font-size:14px;color:var(--ink);line-height:1.4}
+.fld .v. ia{color:#3a4658}
+.iaflag{display:inline-flex;gap:5px;align-items:center;font-size:10.5px;color:var(--violet);background:var(--viols);border-radius:6px;padding:2px 7px;margin-left:6px;vertical-align:middle;font-family:var(--mono);letter-spacing:.04em}
+.kicker{font-family:var(--ser);font-style:italic;font-size:clamp(24px,3.2vw,40px);line-height:1.25;max-width:24ch}
+.note2{margin-top:26px;color:var(--mut);font-size:16px;max-width:60ch;line-height:1.5}
+/* HUD controls */
+.hud{position:fixed;left:50%;bottom:26px;transform:translateX(-50%);z-index:40;display:flex;align-items:center;gap:14px;background:rgba(255,255,255,.92);backdrop-filter:blur(6px);border:1px solid var(--line);border-radius:100px;padding:9px 16px;box-shadow:0 12px 34px -16px rgba(12,27,51,.5)}
+.ctrl{width:30px;height:30px;border-radius:50%;display:flex;align-items:center;justify-content:center;cursor:pointer;color:var(--ink);font-size:12px;border:1px solid var(--line);user-select:none}
+.ctrl:hover{background:var(--bg)}
+.progress{width:230px;height:4px;background:#e3e8ef;border-radius:3px;overflow:hidden}
+#bar{height:100%;width:0;background:linear-gradient(90deg,var(--acc),#37c98a);border-radius:3px}
+.counter{font-family:var(--mono);font-size:11px;color:var(--soft);letter-spacing:.06em;min-width:48px;text-align:center}
+.hint{position:fixed;bottom:26px;right:30px;z-index:40;font-family:var(--mono);font-size:10.5px;color:var(--soft);letter-spacing:.05em}
+.tag{position:fixed;bottom:26px;left:30px;z-index:40;font-family:var(--mono);font-size:10px;letter-spacing:.12em;color:var(--soft);text-transform:uppercase}
+</style></head><body>
+<div class="brand"><span class="lg">GPI</span> Clientes 360°</div>
+<div class="forb">hecho para <img src="../assets/logo-avsa.png" alt="AVSA"></div>
+
+<div class="stagewrap">
+
+  <!-- SCENE 1 · intro -->
+  <section class="scene s-title">
+    <div data-anim class="eyebrow">Módulo · Clientes 360°</div>
+    <h1 data-anim>Todo el cliente,<br>en un solo lugar.</h1>
+    <p class="sub" data-anim>KYC, posiciones, movimientos, gráficos, análisis, informes y comunicación — sin saltar de pantalla y sin pedirle nada a nadie.</p>
+    <div class="chips">
+      <span class="chip on" data-anim><span class="d">●</span>KYC</span>
+      <span class="chip" data-anim>Posiciones</span>
+      <span class="chip" data-anim>Movimientos</span>
+      <span class="chip" data-anim>Gráficos</span>
+      <span class="chip" data-anim>Análisis</span>
+      <span class="chip" data-anim>Informes</span>
+      <span class="chip" data-anim>Conversation Center</span>
+      <span class="chip" data-anim>WhatsApp</span>
+    </div>
+  </section>
+
+  <!-- SCENE 2 · concepto KYC -->
+  <section class="scene s-title">
+    <div data-anim class="eyebrow">Clientes 360° · KYC</div>
+    <h1 data-anim>El KYC no es un<br>formulario muerto.</h1>
+    <p class="sub" data-anim>Es el cliente vivo: quién es, con qué cumple, qué perfil declara — y si su cartera lo respeta.</p>
+    <div class="pillars">
+      <div class="pil" data-anim><div class="ic" style="background:#eaf1fb;color:var(--blue)">◍</div><h3>Identidad y contacto</h3><p>Datos personales, domicilio, cuentas bancarias y todo el legajo, a mano.</p></div>
+      <div class="pil" data-anim><div class="ic" style="background:var(--viols);color:var(--violet)">🛡</div><h3>Compliance al día</h3><p>Estado de cuenta, ARCA, residencia, contrato y mercados habilitados.</p></div>
+      <div class="pil" data-anim><div class="ic" style="background:var(--accs);color:var(--acc)">✦</div><h3>Perfil del inversor con IA</h3><p>El sistema arma el perfil, lo compara con la cartera real y avisa si no cierra.</p></div>
+    </div>
+  </section>
+
+  <!-- SCENE 3 · selección cliente -->
+  <section class="scene" style="padding:64px 80px 110px">
+    <div data-anim class="eyebrow">Paso 1 · Elegís un cliente</div>
+    <div class="app" data-anim style="max-width:1180px;margin:14px auto 0;width:100%">
+      <div class="appbar"><div class="at">Clientes 360 <span>· Visión integral del cliente</span></div>
+        <div class="tabs"><b class="on">KYC</b><b>Posiciones</b><b>Movimientos</b><b>Gráficos</b><b>Análisis</b><b>Informes</b><b>Conversation Center</b><b>WhatsApp</b></div>
+        <span class="beta">BETA</span></div>
+      <div style="padding:24px">
+        <div class="search">
+          <div class="searchbox"><span class="q">⌕</span> 33008<span style="margin-left:auto;color:var(--soft)">▾</span></div>
+          <div class="dd">
+            <div class="it"><span class="id">330085</span><span class="nm">Lozada, Guillermo</span></div>
+            <div class="it"><span class="id">330086</span><span class="nm">Damonte, Mario Carlos</span></div>
+            <div class="it sel"><span class="id">330087</span><span class="nm">Gomez Pizarro, Martín</span><span style="margin-left:auto;color:var(--acc)">✓</span></div>
+            <div class="it"><span class="id">330089</span><span class="nm">Perez Romero, Enrique S.</span></div>
+          </div>
+        </div>
+        <p style="margin-top:20px;color:var(--mut);font-size:15px" data-anim>Buscás por número o por nombre. El legajo entero del cliente se arma al instante.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- SCENE 4 · KYC view (core) -->
+  <section class="scene" style="padding:54px 64px 110px">
+    <div data-anim class="eyebrow">Paso 2 · El cliente, entero — y la IA mirando</div>
+    <div class="app" data-anim style="max-width:1260px;margin:10px auto 0">
+      <div class="appbar"><div class="at">Clientes 360 <span>· 330087 — Gomez Pizarro, Martín</span></div>
+        <div class="tabs"><b class="on">KYC</b><b>Posiciones</b><b>Movimientos</b><b>Gráficos</b><b>Análisis</b><b>Informes</b><b>Conversation Center</b><b>WhatsApp</b></div>
+        <span class="beta">BETA</span></div>
+      <div class="appbody">
+        <div class="ccard">
+          <div class="chead"><div class="av">MG</div><div><div class="nm">Gomez Pizarro, Martín</div><div class="meta"># 330087 · DNI 44261927</div></div></div>
+          <div class="crow"><span class="k">Teléfono</span> +54 9 351 786 2123</div>
+          <div class="crow"><span class="k">Email</span> martingomezpizarro@gmail.com</div>
+          <div class="crow"><span class="k">Domicilio</span> Estancia el Terrón 382</div>
+          <div class="sep"></div>
+          <div class="tagrow"><span class="tg">23 años</span><span class="tg">Lic. Economía</span><span class="tg">Asesor financiero</span><span class="tg">Soltero</span></div>
+          <div class="compl">Estatus compliance</div>
+          <div class="crow"><span class="k">Estado</span> <b style="color:var(--acc)">Activa</b> · Contrato 24/07/2020</div>
+          <div class="tagrow"><span class="tg g">FCI</span><span class="tg g">BYMA</span><span class="tg g">MAV</span><span class="tg">ARCA ✓</span></div>
+        </div>
+        <div class="pi">
+          <div class="pihd">↗ Perfil del inversor</div>
+          <div class="align">⚠ Alineación — la cartera real es <b style="margin:0 4px">2,5 pts</b> más agresiva que el perfil declarado.</div>
+          <div class="gauges">
+            <div class="gauge"><div class="gt">Ratio test</div>
+              <div class="garc"><svg viewBox="0 0 180 104"><defs><linearGradient id="ga" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#2bb673"/><stop offset=".5" stop-color="#f0c029"/><stop offset="1" stop-color="#e0533d"/></linearGradient></defs><path d="M16,92 A76,76 0 0 1 164,92" fill="none" stroke="url(#ga)" stroke-width="13" stroke-linecap="round" opacity=".55"/></svg><div class="needle" style="--rot:0deg"></div></div>
+              <div class="gval">2.5</div><div class="glabel mod">MODERADO</div></div>
+            <div class="gauge"><div class="gt">Ratio cartera</div>
+              <div class="garc"><svg viewBox="0 0 180 104"><path d="M16,92 A76,76 0 0 1 164,92" fill="none" stroke="url(#ga)" stroke-width="13" stroke-linecap="round" opacity=".55"/></svg><div class="needle" style="--rot:88deg"></div></div>
+              <div class="gval">5.0</div><div class="glabel agr">AGRESIVO</div></div>
+            <div class="gauge"><div class="gt">Apalancamiento</div>
+              <div class="garc"><svg viewBox="0 0 180 104"><path d="M16,92 A76,76 0 0 1 164,92" fill="none" stroke="url(#ga)" stroke-width="13" stroke-linecap="round" opacity=".55"/></svg><div class="needle" style="--rot:-58deg"></div></div>
+              <div class="gval">17 %</div><div class="glabel baj">BAJO</div></div>
+          </div>
+          <div class="diag"><div class="h">Diagnóstico</div>La cartera real (5.0) es más agresiva que el perfil del test (2.5). Revisá la alineación con el perfil declarado del cliente.<br><span class="ia">✦ Ver análisis de la IA</span></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- SCENE 5 · perfil IA -->
+  <section class="scene" style="padding:54px 64px 110px">
+    <div data-anim class="eyebrow">Lo que la IA hace por vos</div>
+    <div class="iahead" style="max-width:1260px;margin:0 auto 6px;width:100%">
+      <h1 data-anim style="font-size:clamp(28px,3.4vw,42px)">El perfil se completa solo.</h1>
+      <span class="analizing" data-anim><span class="sp"></span> Analizando conversaciones y movimientos…</span>
+    </div>
+    <div class="cols" data-anim style="max-width:1260px;margin:14px auto 0;width:100%">
+      <div class="col"><div class="ch">Objetivos de la inversión</div>
+        <div class="fld"><div class="l">Cartera administrada</div><div class="v">Administración discrecional total</div></div>
+        <div class="fld"><div class="l">Cartera asignada</div><div class="v">EPI</div></div>
+        <div class="fld"><div class="l">Plazo estipulado</div><div class="v">Mayor a tres años</div></div>
+        <div class="fld"><div class="l">Moneda objetivo</div><div class="v">Dólares</div></div>
+      </div>
+      <div class="col"><div class="ch">Perfil financiero</div>
+        <div class="fld"><div class="l">Tipo de cliente</div><div class="v">Persona física</div></div>
+        <div class="fld"><div class="l">Perfil crediticio <span class="iaflag">✦ IA</span></div><div class="v">Usa de forma recurrente cauciones tomadoras para apalancar.</div></div>
+        <div class="fld"><div class="l">Flujo de fondos <span class="iaflag">✦ IA</span></div><div class="v">Extracciones puntuales de pesos para fondear nuevas carteras.</div></div>
+      </div>
+      <div class="col"><div class="ch">Perfil declarado</div>
+        <div class="fld"><div class="l">En alta</div><div class="v">Crecimiento · Apetito riesgo ARG: Bajo</div></div>
+        <div class="fld"><div class="l">Sesgo sectorial <span class="iaflag">✦ IA</span></div><div class="v">Fuerte sesgo al tecnológico de EE.UU. (Palantir, NVIDIA, Google).</div></div>
+        <div class="fld"><div class="l">Sesgo de moneda <span class="iaflag">✦ IA</span></div><div class="v">Preferencia absoluta por dolarizar la cartera.</div></div>
+      </div>
+    </div>
+    <p class="note2" data-anim style="max-width:1260px;margin-left:auto;margin-right:auto;width:100%">El sistema lee las conversaciones y los movimientos del cliente, y arma el perfil solo. <b style="color:var(--ink)">Vos revisás y firmás.</b></p>
+  </section>
+
+  <!-- SCENE 6 · cierre -->
+  <section class="scene s-title" style="text-align:center;align-items:center">
+    <div data-anim class="eyebrow" style="justify-content:center">Clientes 360° · KYC</div>
+    <h1 data-anim class="kicker" style="max-width:26ch;font-style:normal;font-size:clamp(30px,4.4vw,56px)">El cliente entero, y un copiloto que te avisa cuando algo no cierra.</h1>
+    <p class="sub" data-anim style="margin:26px auto 0;text-align:center">Y esto es solo la <b style="color:var(--ink)">primera de 8 pestañas</b> de Clientes 360°.</p>
+    <div class="chips" data-anim style="justify-content:center">
+      <span class="chip">KYC ✓</span><span class="chip nx2">Posiciones</span><span class="chip">Movimientos</span><span class="chip">Gráficos</span><span class="chip">Análisis</span><span class="chip">Informes</span><span class="chip">Conversation Center</span><span class="chip">WhatsApp</span>
+    </div>
+  </section>
+
+</div>
+
+<div class="hud">
+  <div class="ctrl" id="cprev">◀</div>
+  <div class="ctrl" id="cplay">❚❚</div>
+  <div class="ctrl" id="cnext">▶</div>
+  <div class="progress"><div id="bar"></div></div>
+  <div class="counter" id="counter">01 / 06</div>
+</div>
+<div class="tag">Demo · datos reales</div>
+<div class="hint">Espacio: pausar · ← → : moverse</div>
+
+<script>
+const scenes=[...document.querySelectorAll('.scene')];
+const dur=[15,18,13,28,28,16];
+const bar=document.getElementById('bar'),counter=document.getElementById('counter'),cplay=document.getElementById('cplay');
+let cur=-1,playing=true,raf=null,t0=0,acc=0;
+function enter(i){
+  if(cur>=0){const p=scenes[cur];p.classList.remove('active');p.querySelectorAll('[data-anim]').forEach(e=>e.classList.remove('in'));}
+  cur=i;const s=scenes[i];s.classList.add('active');
+  s.querySelectorAll('[data-anim]').forEach((e,k)=>setTimeout(()=>e.classList.add('in'),90+80*k));
+  counter.textContent=String(i+1).padStart(2,'0')+' / '+String(scenes.length).padStart(2,'0');
+  acc=0;t0=performance.now();
+}
+function frame(now){
+  if(!playing)return;
+  const el=acc+(now-t0)/1000,p=Math.min(el/dur[cur],1);
+  bar.style.width=(p*100)+'%';
+  if(p>=1){
+    if(cur<scenes.length-1){enter(cur+1);}
+    else{playing=false;cplay.textContent='↻';bar.style.width='100%';return;}
+  }
+  raf=requestAnimationFrame(frame);
+}
+function play(){playing=true;cplay.textContent='❚❚';t0=performance.now();cancelAnimationFrame(raf);raf=requestAnimationFrame(frame);}
+function pause(){playing=false;cplay.textContent='▶';cancelAnimationFrame(raf);acc=acc+(performance.now()-t0)/1000;}
+function toggle(){playing?pause():(cur>=scenes.length-1?(enter(0),play()):play());}
+function next(){if(cur<scenes.length-1){enter(cur+1);bar.style.width='0';if(playing)play();}}
+function prev(){if(cur>0){enter(cur-1);bar.style.width='0';if(playing)play();}}
+document.getElementById('cnext').onclick=next;
+document.getElementById('cprev').onclick=prev;
+cplay.onclick=toggle;
+document.addEventListener('keydown',e=>{
+  if(e.code==='Space'){e.preventDefault();toggle();}
+  else if(e.code==='ArrowRight'){e.preventDefault();next();}
+  else if(e.code==='ArrowLeft'){e.preventDefault();prev();}
+});
+enter(0);play();
+</script>
+</body></html>

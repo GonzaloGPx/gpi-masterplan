@@ -1,0 +1,554 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>GPI · Hecho para Argentina Valores</title>
+<meta name="description" content="El sistema operativo del asesor financiero. Una propuesta para Argentina Valores." />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600&family=Inter:wght@400;500;600;700&family=Geist+Mono:wght@400;500&display=swap" rel="stylesheet" />
+<style>
+:root{
+  --ink:#07090d;
+  --ink-2:#0a0d13;
+  --surface:#11151d;
+  --surface-2:#161b25;
+  --line:rgba(255,255,255,.09);
+  --line-2:rgba(255,255,255,.16);
+  --text:#eaeef5;
+  --muted:#98a3b3;
+  --dim:#69727f;
+  --accent:#34e0a1;
+  --accent-2:#6ee7ff;
+  --violet:#a78bfa;
+  --warn:#f7b267;
+  --danger:#ff6b6b;
+  --font-display:'Fraunces',Georgia,'Times New Roman',serif;
+  --font-sans:'Inter',system-ui,-apple-system,'Segoe UI',Roboto,sans-serif;
+  --font-mono:'Geist Mono',ui-monospace,'SF Mono',Menlo,monospace;
+  --maxw:1180px;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{
+  background:var(--ink);
+  color:var(--text);
+  font-family:var(--font-sans);
+  font-size:17px;
+  line-height:1.6;
+  -webkit-font-smoothing:antialiased;
+  overflow-x:hidden;
+}
+body::before{ /* grain */
+  content:"";position:fixed;inset:0;z-index:9999;pointer-events:none;opacity:.035;
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+}
+::selection{background:rgba(52,224,161,.28);color:#fff}
+
+/* ---------- layout helpers ---------- */
+.wrap{max-width:var(--maxw);margin:0 auto;padding:0 32px}
+section{position:relative;padding:120px 0}
+.eyebrow{
+  font-family:var(--font-mono);font-size:12.5px;letter-spacing:.22em;text-transform:uppercase;
+  color:var(--accent);margin-bottom:22px;display:flex;align-items:center;gap:12px;
+}
+.eyebrow::before{content:"";width:26px;height:1px;background:var(--accent);opacity:.7}
+h1,h2,h3{font-family:var(--font-display);font-weight:500;line-height:1.05;letter-spacing:-.01em}
+h2.display{font-size:clamp(34px,5vw,60px)}
+.lead{font-size:clamp(18px,2vw,22px);color:var(--muted);max-width:62ch;line-height:1.55}
+.serif{font-family:var(--font-display)}
+.mono{font-family:var(--font-mono)}
+.accent{color:var(--accent)}
+.warn{color:var(--warn)}
+
+/* ---------- top progress + nav ---------- */
+#progress{position:fixed;top:0;left:0;height:2px;width:0;background:linear-gradient(90deg,var(--accent),var(--accent-2));z-index:200;transition:width .1s linear}
+#topbar{
+  position:fixed;top:0;left:0;right:0;z-index:150;
+  display:flex;align-items:center;justify-content:space-between;
+  padding:18px 32px;
+  background:linear-gradient(180deg,rgba(7,9,13,.85),rgba(7,9,13,0));
+  backdrop-filter:blur(4px);
+}
+#topbar .brand{font-family:var(--font-mono);font-size:13px;letter-spacing:.16em;color:var(--text)}
+#topbar .brand b{color:var(--accent);font-weight:500}
+#topbar .for{display:flex;align-items:center;gap:12px;font-family:var(--font-mono);font-size:11px;letter-spacing:.14em;color:var(--dim);text-transform:uppercase}
+#topbar .for img{height:26px;opacity:.92}
+
+#dots{position:fixed;right:22px;top:50%;transform:translateY(-50%);z-index:150;display:flex;flex-direction:column;gap:13px}
+#dots a{width:9px;height:9px;border-radius:50%;background:rgba(255,255,255,.18);transition:.25s;position:relative}
+#dots a:hover{background:var(--muted)}
+#dots a.active{background:var(--accent);box-shadow:0 0 0 4px rgba(52,224,161,.15)}
+#dots a span{position:absolute;right:18px;top:50%;transform:translateY(-50%);white-space:nowrap;font-family:var(--font-mono);font-size:10.5px;letter-spacing:.1em;color:var(--muted);background:var(--surface);border:1px solid var(--line);padding:3px 9px;border-radius:6px;opacity:0;pointer-events:none;transition:.2s;text-transform:uppercase}
+#dots a:hover span{opacity:1}
+@media(max-width:900px){#dots{display:none}}
+
+/* ---------- reveal ---------- */
+[data-reveal]{opacity:0;transform:translateY(26px);transition:opacity .9s cubic-bezier(.2,.7,.2,1),transform .9s cubic-bezier(.2,.7,.2,1)}
+[data-reveal].in{opacity:1;transform:none}
+[data-reveal][data-delay="1"]{transition-delay:.08s}
+[data-reveal][data-delay="2"]{transition-delay:.16s}
+[data-reveal][data-delay="3"]{transition-delay:.24s}
+[data-reveal][data-delay="4"]{transition-delay:.32s}
+
+/* ---------- HERO ---------- */
+#hero{min-height:100vh;display:flex;align-items:center;padding:0;overflow:hidden}
+.aurora{position:absolute;inset:0;z-index:0;overflow:hidden;filter:blur(60px);opacity:.7}
+.aurora i{position:absolute;border-radius:50%;mix-blend-mode:screen;animation:drift 22s ease-in-out infinite alternate}
+.aurora i:nth-child(1){width:55vw;height:55vw;left:-10vw;top:-18vw;background:radial-gradient(circle,rgba(52,224,161,.5),transparent 62%)}
+.aurora i:nth-child(2){width:48vw;height:48vw;right:-8vw;top:-6vw;background:radial-gradient(circle,rgba(110,231,255,.38),transparent 62%);animation-delay:-6s}
+.aurora i:nth-child(3){width:46vw;height:46vw;left:18vw;bottom:-22vw;background:radial-gradient(circle,rgba(167,139,250,.34),transparent 62%);animation-delay:-12s}
+@keyframes drift{0%{transform:translate(0,0) scale(1)}100%{transform:translate(6vw,5vw) scale(1.15)}}
+.hero-grid{position:absolute;inset:0;z-index:1;background-image:linear-gradient(rgba(255,255,255,.03) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.03) 1px,transparent 1px);background-size:64px 64px;mask-image:radial-gradient(ellipse 80% 70% at 50% 40%,#000,transparent 75%)}
+.hero-inner{position:relative;z-index:2;width:100%}
+.hero-eyebrow{font-family:var(--font-mono);font-size:13px;letter-spacing:.24em;text-transform:uppercase;color:var(--accent);margin-bottom:30px}
+#hero h1{font-size:clamp(42px,7.2vw,92px);max-width:16ch;letter-spacing:-.02em}
+#hero h1 .em{font-style:italic;color:transparent;background:linear-gradient(120deg,var(--accent),var(--accent-2) 60%,var(--violet));-webkit-background-clip:text;background-clip:text}
+#hero .sub{margin-top:34px;font-size:clamp(18px,2.1vw,23px);color:var(--muted);max-width:60ch;line-height:1.5}
+#hero .meta{margin-top:46px;display:flex;gap:26px;align-items:center;flex-wrap:wrap;font-family:var(--font-mono);font-size:12px;letter-spacing:.12em;text-transform:uppercase;color:var(--dim)}
+#hero .meta .pill{border:1px solid var(--line-2);border-radius:100px;padding:8px 16px}
+.scrollcue{position:absolute;bottom:34px;left:50%;transform:translateX(-50%);z-index:3;font-family:var(--font-mono);font-size:11px;letter-spacing:.2em;color:var(--dim);text-transform:uppercase;display:flex;flex-direction:column;align-items:center;gap:10px;animation:bob 2.4s ease-in-out infinite}
+.scrollcue .ln{width:1px;height:34px;background:linear-gradient(var(--accent),transparent)}
+@keyframes bob{50%{transform:translateX(-50%) translateY(8px)}}
+
+/* ---------- stat block ---------- */
+.bignum{font-family:var(--font-display);font-size:clamp(96px,17vw,220px);line-height:.86;letter-spacing:-.03em;background:linear-gradient(180deg,#fff,rgba(255,255,255,.35));-webkit-background-clip:text;background-clip:text;color:transparent}
+.split{display:grid;grid-template-columns:1fr 1fr;gap:60px;align-items:center}
+@media(max-width:880px){.split{grid-template-columns:1fr;gap:36px}}
+.eaters{list-style:none;display:flex;flex-direction:column;gap:2px}
+.eaters li{display:flex;gap:16px;align-items:flex-start;padding:14px 0;border-bottom:1px solid var(--line);color:var(--muted)}
+.eaters li .x{color:var(--danger);font-family:var(--font-mono);font-size:13px;margin-top:3px;flex-shrink:0}
+.pullquote{margin-top:40px;font-family:var(--font-display);font-style:italic;font-size:clamp(22px,3vw,32px);line-height:1.3;color:var(--text);max-width:24ch}
+.pullquote::before{content:"“";color:var(--accent)}
+.pullquote::after{content:"”";color:var(--accent)}
+
+/* ---------- cards ---------- */
+.cards{display:grid;gap:20px}
+.cards.c4{grid-template-columns:repeat(4,1fr)}
+.cards.c3{grid-template-columns:repeat(3,1fr)}
+.cards.c2{grid-template-columns:repeat(2,1fr)}
+@media(max-width:980px){.cards.c4{grid-template-columns:repeat(2,1fr)}.cards.c3{grid-template-columns:1fr}}
+@media(max-width:680px){.cards.c4,.cards.c2{grid-template-columns:1fr}}
+.card{background:linear-gradient(180deg,var(--surface),var(--ink-2));border:1px solid var(--line);border-radius:16px;padding:26px;transition:.35s;position:relative;overflow:hidden}
+.card:hover{border-color:var(--line-2);transform:translateY(-4px);background:linear-gradient(180deg,var(--surface-2),var(--ink-2))}
+.card h3{font-size:20px;margin-bottom:10px}
+.card p{color:var(--muted);font-size:15.5px}
+.card .ico{font-family:var(--font-mono);color:var(--accent);font-size:13px;letter-spacing:.1em;margin-bottom:18px;opacity:.85}
+
+/* modules */
+.mods{display:grid;grid-template-columns:repeat(2,1fr);gap:16px}
+@media(max-width:820px){.mods{grid-template-columns:1fr}}
+.mod{display:flex;gap:22px;padding:24px;border:1px solid var(--line);border-radius:14px;background:rgba(255,255,255,.012);transition:.35s;cursor:default}
+.mod:hover{background:rgba(52,224,161,.05);border-color:rgba(52,224,161,.35)}
+.mod .n{font-family:var(--font-display);font-size:34px;color:var(--accent);line-height:1;min-width:46px;opacity:.85}
+.mod h3{font-size:18px;margin-bottom:6px}
+.mod p{color:var(--muted);font-size:14.5px}
+.mod .tag{display:inline-block;margin-top:10px;font-family:var(--font-mono);font-size:10.5px;letter-spacing:.1em;text-transform:uppercase;color:var(--accent-2);border:1px solid rgba(110,231,255,.3);padding:3px 9px;border-radius:100px}
+
+/* timeline */
+.tl{position:relative;padding-left:36px}
+.tl::before{content:"";position:absolute;left:8px;top:8px;bottom:8px;width:1px;background:linear-gradient(var(--accent),var(--violet))}
+.tl .item{position:relative;padding:0 0 44px}
+.tl .item:last-child{padding-bottom:0}
+.tl .item::before{content:"";position:absolute;left:-32px;top:6px;width:13px;height:13px;border-radius:50%;background:var(--ink);border:2px solid var(--accent);box-shadow:0 0 0 4px rgba(52,224,161,.12)}
+.tl .time{font-family:var(--font-mono);font-size:13px;letter-spacing:.12em;color:var(--accent);margin-bottom:8px}
+.tl h3{font-size:23px;margin-bottom:10px}
+.tl p{color:var(--muted);max-width:64ch}
+.tl .agent{margin-top:14px;display:flex;flex-wrap:wrap;gap:8px}
+.tl .agent span{font-size:13.5px;color:var(--text);background:var(--surface);border:1px solid var(--line);border-radius:8px;padding:7px 12px}
+
+/* proof frames */
+.frame{border:1px solid var(--line-2);border-radius:14px;overflow:hidden;background:var(--surface);box-shadow:0 30px 80px -30px rgba(0,0,0,.8)}
+.frame .bar{display:flex;align-items:center;gap:8px;padding:11px 15px;background:var(--ink-2);border-bottom:1px solid var(--line)}
+.frame .bar i{width:11px;height:11px;border-radius:50%;background:#2a2f3a;display:inline-block}
+.frame .bar .url{margin-left:14px;font-family:var(--font-mono);font-size:11.5px;color:var(--dim)}
+.shot{aspect-ratio:16/9;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px;text-align:center;padding:30px;background:repeating-linear-gradient(45deg,rgba(255,255,255,.018) 0 12px,transparent 12px 24px)}
+.shot .badge{font-family:var(--font-mono);font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--accent);border:1px dashed rgba(52,224,161,.4);border-radius:100px;padding:6px 14px}
+.shot .cap{color:var(--muted);font-size:14.5px;max-width:34ch}
+.shot .num{font-family:var(--font-display);font-size:40px;color:rgba(255,255,255,.13)}
+
+/* before/after */
+.ba{position:relative;border-radius:16px;overflow:hidden;border:1px solid var(--line-2);height:520px;user-select:none;touch-action:none}
+@media(max-width:680px){.ba{height:560px}}
+.ba .panel{position:absolute;inset:0;padding:30px}
+.ba .after{background:linear-gradient(150deg,#0c1117,#0a1f1a)}
+.ba .before{background:linear-gradient(150deg,#141016,#0e0c10);clip-path:inset(0 50% 0 0)}
+.ba .ptitle{font-family:var(--font-mono);font-size:12px;letter-spacing:.16em;text-transform:uppercase;margin-bottom:20px;display:flex;align-items:center;gap:10px}
+.ba .before .ptitle{color:var(--warn)}
+.ba .after .ptitle{color:var(--accent)}
+.ba .handle{position:absolute;top:0;bottom:0;left:50%;width:2px;background:var(--accent-2);z-index:5;cursor:ew-resize}
+.ba .handle::after{content:"⟷";position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:42px;height:42px;border-radius:50%;background:var(--accent-2);color:#04201a;display:flex;align-items:center;justify-content:center;font-size:18px;box-shadow:0 6px 24px rgba(0,0,0,.5)}
+/* mock bits */
+.win{background:#0d0f14;border:1px solid var(--line);border-radius:9px;padding:13px;margin-bottom:11px}
+.win .wt{font-family:var(--font-mono);font-size:11px;color:var(--dim);margin-bottom:9px;display:flex;justify-content:space-between}
+.row{height:8px;border-radius:4px;background:rgba(255,255,255,.08);margin:7px 0}
+.row.s{width:60%}.row.m{width:80%}
+.alert{font-size:12.5px;border-radius:7px;padding:8px 11px;margin:8px 0;display:flex;align-items:center;gap:8px}
+.alert.err{background:rgba(255,107,107,.12);border:1px solid rgba(255,107,107,.35);color:#ffb3b3}
+.alert.wait{background:rgba(247,178,103,.12);border:1px solid rgba(247,178,103,.3);color:#ffd9a8}
+.spin{width:13px;height:13px;border:2px solid rgba(255,255,255,.2);border-top-color:var(--warn);border-radius:50%;animation:sp 1s linear infinite}
+@keyframes sp{to{transform:rotate(360deg)}}
+.ba .after .railedge{position:absolute;left:0;top:0;bottom:0;width:64px;background:linear-gradient(180deg,rgba(52,224,161,.07),transparent);border-right:1px solid var(--line)}
+.ba .after .railedge::before{content:"";position:absolute;left:17px;top:30px;width:30px;height:30px;border-radius:8px;background:rgba(52,224,161,.18);border:1px solid rgba(52,224,161,.4);box-shadow:0 48px 0 rgba(255,255,255,.05),0 96px 0 rgba(255,255,255,.05),0 144px 0 rgba(255,255,255,.05),0 192px 0 rgba(255,255,255,.05)}
+.ba .after .stage{position:absolute;right:30px;top:30px;bottom:30px;width:50%;display:flex;flex-direction:column;justify-content:center}
+@media(max-width:680px){.ba .after .stage{width:62%}}
+.agentcard{background:rgba(52,224,161,.07);border:1px solid rgba(52,224,161,.32);border-radius:10px;padding:14px;margin-top:10px}
+.agentcard .lbl{font-family:var(--font-mono);font-size:10px;letter-spacing:.14em;text-transform:uppercase;color:var(--accent);margin-bottom:8px}
+.agentcard p{font-size:13.5px;color:var(--text);line-height:1.45}
+.agentcard .btns{display:flex;gap:8px;margin-top:12px}
+.agentcard .btns b{font-size:12px;font-weight:500;padding:7px 14px;border-radius:7px;cursor:default}
+.agentcard .btns b.go{background:var(--accent);color:#04201a}
+.agentcard .btns b.ed{border:1px solid var(--line-2);color:var(--muted)}
+
+/* pillars (why) */
+.pillar{border-top:1px solid var(--line);padding:26px 0;display:grid;grid-template-columns:46px 1fr;gap:22px;align-items:start}
+.pillar .k{font-family:var(--font-mono);color:var(--accent);font-size:14px}
+.pillar h3{font-size:21px;margin-bottom:8px}
+.pillar p{color:var(--muted);font-size:15.5px;max-width:70ch}
+
+/* ask */
+.ask{display:grid;grid-template-columns:1.1fr 1fr;gap:50px}
+@media(max-width:880px){.ask{grid-template-columns:1fr}}
+.asklist{list-style:none;display:flex;flex-direction:column;gap:14px}
+.asklist li{display:flex;gap:14px;align-items:flex-start;font-size:16.5px}
+.asklist li .c{color:var(--accent);flex-shrink:0;font-size:18px;margin-top:1px}
+.steps{counter-reset:s;display:flex;flex-direction:column;gap:16px}
+.step{counter-increment:s;position:relative;padding:20px 22px 20px 64px;border:1px solid var(--line);border-radius:13px;background:rgba(255,255,255,.012)}
+.step::before{content:counter(s);position:absolute;left:20px;top:18px;width:30px;height:30px;border-radius:50%;border:1px solid var(--accent);color:var(--accent);font-family:var(--font-mono);font-size:14px;display:flex;align-items:center;justify-content:center}
+.step h3{font-size:17px;font-family:var(--font-sans);font-weight:600;margin-bottom:4px}
+.step p{color:var(--muted);font-size:14.5px}
+
+/* closing */
+#close{text-align:center;padding:160px 0}
+#close h2{font-size:clamp(32px,5.2vw,62px);max-width:20ch;margin:0 auto;line-height:1.1}
+#close .sig{margin-top:60px;display:flex;align-items:center;justify-content:center;gap:26px;flex-wrap:wrap;font-family:var(--font-mono);font-size:12px;letter-spacing:.14em;text-transform:uppercase;color:var(--dim)}
+#close .sig img{height:30px;opacity:.9}
+#close .sig b{color:var(--accent);font-weight:500}
+
+.divider{height:1px;background:var(--line);max-width:var(--maxw);margin:0 auto}
+.alt{background:var(--ink-2)}
+.note{font-family:var(--font-mono);font-size:11.5px;color:var(--dim);letter-spacing:.04em;margin-top:18px}
+.kicker{font-size:clamp(22px,2.6vw,30px);font-family:var(--font-display);line-height:1.25;max-width:30ch;margin-top:18px}
+</style>
+</head>
+<body>
+
+<div id="progress"></div>
+<div id="topbar">
+  <div class="brand"><b>GPI</b> · Gomez Pizarro Intelligence</div>
+  <div class="for">Hecho para <img src="assets/logo-avsa.png" alt="Argentina Valores" /></div>
+</div>
+
+<nav id="dots"></nav>
+
+<!-- ======================= HERO ======================= -->
+<section id="hero" data-title="Inicio">
+  <div class="aurora"><i></i><i></i><i></i></div>
+  <div class="hero-grid"></div>
+  <div class="wrap hero-inner">
+    <div class="hero-eyebrow" data-reveal>Una propuesta para Argentina Valores</div>
+    <h1 data-reveal data-delay="1">El sistema operativo del <span class="em">asesor financiero</span>.</h1>
+    <p class="sub" data-reveal data-delay="2">Una sola plataforma donde el agente de IA propone y el asesor decide. Pensada para que los productores de AVSA dejen de pelear con la herramienta y vuelvan a lo que saben hacer: asesorar y vender.</p>
+    <div class="meta" data-reveal data-delay="3">
+      <span class="pill">Confidencial</span>
+      <span>1 de julio de 2026</span>
+      <span>·</span>
+      <span>El agente propone · el asesor dispone</span>
+    </div>
+  </div>
+  <div class="scrollcue">Desplazá<div class="ln"></div></div>
+</section>
+
+<!-- ======================= PROBLEMA ======================= -->
+<section id="problema" class="alt" data-title="El problema">
+  <div class="wrap">
+    <div class="eyebrow" data-reveal>El punto de partida</div>
+    <div class="split">
+      <div>
+        <div class="bignum" data-reveal>70%</div>
+        <p class="lead" data-reveal data-delay="1" style="margin-top:18px">del día de un asesor se va en tareas administrativas que <b style="color:var(--text)">no escalan</b> — tiempo que no factura mejor y que no le mejora la vida al cliente.</p>
+        <p class="pullquote" data-reveal data-delay="2">El asesor que mejor podría vender, es el que más tiempo pierde sin vender.</p>
+      </div>
+      <div data-reveal data-delay="1">
+        <div class="mono" style="color:var(--dim);font-size:12px;letter-spacing:.14em;text-transform:uppercase;margin-bottom:14px">Lo que le come el día</div>
+        <ul class="eaters">
+          <li><span class="x">✕</span> Armar informes, uno por uno, para cada cliente</li>
+          <li><span class="x">✕</span> Saltar entre dos plataformas para una extracción o un informe</li>
+          <li><span class="x">✕</span> Atender al cliente que llama porque no puede operar solo</li>
+          <li><span class="x">✕</span> Releer historiales antes de cada reunión</li>
+          <li><span class="x">✕</span> Seguir cupones, vencimientos y dividendos a mano</li>
+          <li><span class="x">✕</span> Pasar órdenes a la mesa y controlar saldos descubiertos</li>
+          <li><span class="x">✕</span> Tomar notas de cada call y redactar los follow-ups</li>
+          <li><span class="x">✕</span> Tratar de no olvidarse de nadie</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ======================= COSTO ======================= -->
+<section id="costo" data-title="El costo">
+  <div class="wrap">
+    <div class="eyebrow" data-reveal>Lo que esa fricción cuesta</div>
+    <h2 class="display" data-reveal data-delay="1" style="max-width:20ch">Para una casa de <span class="accent">3.500 clientes</span> y 35 productores camino a seis sucursales, la fricción tiene un nombre: <span class="serif" style="font-style:italic">techo</span>.</h2>
+    <div class="cards c4" style="margin-top:56px">
+      <div class="card" data-reveal data-delay="1"><div class="ico">01</div><h3>Techo de crecimiento</h3><p>Cada productor topa en cuántos clientes puede atender bien. Más clientes = peor servicio, no más negocio.</p></div>
+      <div class="card" data-reveal data-delay="2"><div class="ico">02</div><h3>Experiencia del cliente</h3><p>Idas y vueltas, demoras y errores de plataforma que el cliente vive como falta de profesionalismo.</p></div>
+      <div class="card" data-reveal data-delay="3"><div class="ico">03</div><h3>Retención en riesgo</h3><p>El cliente que se va no siempre se va por rendimiento. Muchas veces se va por servicio.</p></div>
+      <div class="card" data-reveal data-delay="4"><div class="ico">04</div><h3>Sucursales nuevas, lentas</h3><p>Mendoza y Salta el año que viene. Cada apertura arranca de cero sin una herramienta que estandarice.</p></div>
+    </div>
+  </div>
+</section>
+
+<!-- ======================= VISION ======================= -->
+<section id="vision" class="alt" data-title="La visión" style="text-align:center;padding:160px 0">
+  <div class="wrap">
+    <div class="eyebrow" style="justify-content:center" data-reveal>La visión</div>
+    <h2 data-reveal data-delay="1" style="font-size:clamp(38px,6vw,76px);max-width:18ch;margin:0 auto">Una sola plataforma. El <span class="accent">90%</span> del trabajo del asesor, resuelto.</h2>
+    <p class="lead" data-reveal data-delay="2" style="margin:30px auto 0">Siete módulos integrados. Un agente de IA que ve todo. El asesor decide siempre.</p>
+    <p class="serif" data-reveal data-delay="3" style="font-style:italic;font-size:clamp(26px,4vw,44px);margin-top:50px;background:linear-gradient(120deg,var(--accent),var(--accent-2),var(--violet));-webkit-background-clip:text;background-clip:text;color:transparent;display:inline-block">El agente propone. El asesor dispone.</p>
+  </div>
+</section>
+
+<!-- ======================= MODULOS ======================= -->
+<section id="modulos" data-title="7 módulos">
+  <div class="wrap">
+    <div class="eyebrow" data-reveal>El producto</div>
+    <h2 class="display" data-reveal data-delay="1" style="margin-bottom:48px">Siete módulos, un solo lugar.</h2>
+    <div class="mods">
+      <div class="mod" data-reveal><div class="n">01</div><div><h3>Novedades de clientes</h3><p>Cupones, transferencias, saldos descubiertos. El agente prioriza y propone la acción — vos aprobás.</p></div></div>
+      <div class="mod" data-reveal><div class="n">02</div><div><h3>Novedades de mercado</h3><p>Filtradas por relevancia para cada cliente. No un feed genérico: lo que le importa a tu cartera.</p></div></div>
+      <div class="mod" data-reveal data-delay="1"><div class="n">03</div><div><h3>Agenda y tareas del día</h3><p>Se auto-actualizan con cada decisión.<span class="tag">Google Calendar de los dos lados</span></p></div></div>
+      <div class="mod" data-reveal data-delay="1"><div class="n">04</div><div><h3>Cliente 360°</h3><p>Cartera, KYC, historial, calls grabadas y resumidas, brief y follow-up redactados solos.</p></div></div>
+      <div class="mod" data-reveal data-delay="2"><div class="n">05</div><div><h3>Inteligencia comercial</h3><p>Aranceles, Pareto por asesor, segmentación, salud de la cartera.<span class="tag">A nivel asesor, sin candados</span></p></div></div>
+      <div class="mod" data-reveal data-delay="2"><div class="n">06</div><div><h3>Mercado en vivo</h3><p>Indicadores e índices clave, curvas y calculadoras de renta fija (TIR, paridad, flujo de fondos).</p></div></div>
+      <div class="mod" data-reveal data-delay="3" style="grid-column:1/-1"><div class="n">07</div><div><h3>Herramientas + agente</h3><p>Órdenes a la mesa y avisos por WhatsApp <b style="color:var(--text)">conversacional</b> — no solo enviar reportes, sino conversar y ejecutar. Informes a la marca de AVSA, en un clic.<span class="tag">WhatsApp bidireccional + bot white-label cara-cliente</span></p></div></div>
+    </div>
+  </div>
+</section>
+
+<!-- ======================= UN DIA ======================= -->
+<section id="dia" class="alt" data-title="Un día con GPI">
+  <div class="wrap">
+    <div class="eyebrow" data-reveal>Un día con el sistema</div>
+    <h2 class="display" data-reveal data-delay="1" style="margin-bottom:54px">Cómo se siente operar adentro.</h2>
+    <div class="tl">
+      <div class="item" data-reveal>
+        <div class="time">9:00</div>
+        <h3>Entrás. La tarea ya está hecha.</h3>
+        <p>Durante la noche el sistema se conectó a tu back office y a los feeds de mercado. Cuando abrís la plataforma, el agente ya sabe quién cobró cupones, quién transfirió plata, qué balances salen hoy y qué saldos están descubiertos.</p>
+      </div>
+      <div class="item" data-reveal data-delay="1">
+        <div class="time">9:15</div>
+        <h3>Te muestra las novedades priorizadas.</h3>
+        <p>El agente no te tira un listado: te propone qué hacer con cada cosa. Vos decidís, el agente ejecuta.</p>
+        <div class="agent">
+          <span>“10 clientes cobraron cupón del Bopreal. ¿Mando WhatsApp?”</span>
+          <span>“Juan transfirió 10M. ¿Armo propuesta?”</span>
+          <span>“Pedro quedó con saldo deudor. ¿Renovamos caución?”</span>
+        </div>
+      </div>
+      <div class="item" data-reveal data-delay="2">
+        <div class="time">El resto del día</div>
+        <h3>Te dedicás a lo que importa.</h3>
+        <p>Tus calls con clientes se graban y resumen. Los follow-ups se redactan solos. Los informes se arman a tu marca. El agente avisa cuando un precio objetivo se toca, cuando un balance sorprende, cuando un cliente te necesita. Vos asesorás; la administración corre sola.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ======================= PRUEBA ======================= -->
+<section id="prueba" data-title="La prueba">
+  <div class="wrap">
+    <div class="eyebrow" data-reveal>No es una maqueta</div>
+    <h2 class="display" data-reveal data-delay="1" style="max-width:22ch">Ya corre sobre datos de AVSA.</h2>
+    <p class="lead" data-reveal data-delay="2" style="margin-top:18px">Lo que sigue son pantallas reales del sistema funcionando con la operación de la casa. No una promesa: un producto andando.</p>
+    <div class="cards c2" style="margin-top:48px">
+      <div data-reveal data-delay="1">
+        <div class="frame"><div class="bar"><i></i><i></i><i></i><span class="url">gpi · dashboard</span></div>
+          <div class="shot"><div class="num">01</div><div class="badge">Captura a insertar</div><div class="cap">Dashboard: AUM consolidado de la casa, multi-cuenta y multi-moneda</div></div></div>
+      </div>
+      <div data-reveal data-delay="2">
+        <div class="frame"><div class="bar"><i></i><i></i><i></i><span class="url">gpi · cliente 360°</span></div>
+          <div class="shot"><div class="num">02</div><div class="badge">Captura a insertar</div><div class="cap">Análisis de un cliente: rendimiento TWR y TIR, multimoneda</div></div></div>
+      </div>
+      <div data-reveal data-delay="1">
+        <div class="frame"><div class="bar"><i></i><i></i><i></i><span class="url">gpi · informe</span></div>
+          <div class="shot"><div class="num">03</div><div class="badge">Captura a insertar</div><div class="cap">Informe profesional auto-generado, a la marca de AVSA</div></div></div>
+      </div>
+      <div data-reveal data-delay="2">
+        <div class="frame"><div class="bar"><i></i><i></i><i></i><span class="url">gpi · inteligencia comercial</span></div>
+          <div class="shot"><div class="num">04</div><div class="badge">Captura a insertar</div><div class="cap">Pareto de clientes y aranceles a nivel asesor</div></div></div>
+      </div>
+    </div>
+    <p class="note" data-reveal>* Capturas con datos reales del día anterior — a completar antes de la reunión. Ver guía de capturas (GUION-Y-CAPTURAS.md).</p>
+  </div>
+</section>
+
+<!-- ======================= ANTES / DESPUES ======================= -->
+<section id="contraste" class="alt" data-title="Antes / Después">
+  <div class="wrap">
+    <div class="eyebrow" data-reveal>El mismo asesor, dos realidades</div>
+    <h2 class="display" data-reveal data-delay="1" style="margin-bottom:14px">Arrastrá para comparar.</h2>
+    <p class="lead" data-reveal data-delay="2" style="margin-bottom:40px">A la izquierda, el día de hoy. A la derecha, el mismo día con GPI.</p>
+    <div class="ba" id="ba" data-reveal data-delay="1">
+      <!-- AFTER (right, full) -->
+      <div class="panel after">
+        <div class="railedge"></div>
+        <div class="stage">
+          <div class="ptitle">● Con GPI — un solo panel</div>
+          <div class="win"><div class="wt"><span>Novedades priorizadas</span><span style="color:var(--accent)">al día</span></div>
+            <div class="row m"></div><div class="row s"></div>
+          </div>
+          <div class="agentcard"><div class="lbl">El agente propone</div>
+            <p>10 clientes cobraron cupón del Bopreal 2027. ¿Enviar aviso por WhatsApp a marca de AVSA?</p>
+            <div class="btns"><b class="go">Aprobar y enviar</b><b class="ed">Editar</b></div>
+          </div>
+        </div>
+      </div>
+      <!-- BEFORE (left, clipped) -->
+      <div class="panel before" id="baBefore">
+        <div class="ptitle">● Hoy — saltando entre plataformas</div>
+        <div class="win"><div class="wt"><span>homebroker — cliente</span><span>tab 1</span></div>
+          <div class="alert err">⚠ Error de conexión. Reintentá más tarde.</div>
+          <div class="row m"></div><div class="row s"></div>
+        </div>
+        <div class="win"><div class="wt"><span>back office — productor</span><span>tab 2</span></div>
+          <div class="alert wait"><span class="spin"></span> Solicitud enviada — esperando a la mesa…</div>
+          <div class="row m"></div>
+        </div>
+        <div class="win"><div class="wt"><span>informe.xlsx</span><span>a mano</span></div>
+          <div class="row s"></div><div class="row m"></div>
+        </div>
+      </div>
+      <div class="handle" id="baHandle"></div>
+    </div>
+  </div>
+</section>
+
+<!-- ======================= POR QUE GPI ======================= -->
+<section id="porque" data-title="Por qué GPI">
+  <div class="wrap">
+    <div class="eyebrow" data-reveal>Por qué GPI, y no otra cosa</div>
+    <h2 class="display" data-reveal data-delay="1" style="max-width:24ch;margin-bottom:14px">Lo que nadie más le está dando a tus asesores.</h2>
+    <p class="lead" data-reveal data-delay="2" style="margin-bottom:30px">A medida de AVSA, no un producto genérico para “todas las ALyC”. Tu roadmap, no una cola de espera.</p>
+    <div data-reveal>
+      <div class="pillar"><div class="k">①</div><div><h3>Autogestión de verdad, a tu medida</h3><p>Desescalamos la app del asesor a una app del cliente final, hecha para AVSA. El cliente <b style="color:var(--text)">opera</b>, no “solicita y espera”. Rápido de resolver, y a la medida de cómo trabaja la casa.</p></div></div>
+      <div class="pillar"><div class="k">②</div><div><h3>WhatsApp conversacional + Calendar</h3><p>No solo mandar reportes: conversar con el cliente, agendar, ejecutar. Un bot white-label con la cara de AVSA, y la agenda sincronizada con Google de los dos lados.</p></div></div>
+      <div class="pillar"><div class="k">③</div><div><h3>Tu inteligencia comercial, sin candados</h3><p>Pareto, aranceles y comisiones <b style="color:var(--text)">a nivel asesor</b> — porque es tu herramienta, no la de un proveedor que decide qué podés ver.</p></div></div>
+      <div class="pillar"><div class="k">④</div><div><h3>Independencia</h3><p>Una capa neutral, agnóstica de back office. Adoptar GPI es no profundizar tu dependencia de un único proveedor de infraestructura — y a mejores precios.</p></div></div>
+    </div>
+  </div>
+</section>
+
+<!-- ======================= POR QUE NOSOTROS ======================= -->
+<section id="nosotros" class="alt" data-title="Por qué nosotros">
+  <div class="wrap">
+    <div class="eyebrow" data-reveal>El equipo</div>
+    <h2 class="display" data-reveal data-delay="1" style="max-width:22ch;margin-bottom:14px">Un asesor le compra software a alguien que entiende su mundo.</h2>
+    <p class="lead" data-reveal data-delay="2" style="margin-bottom:44px">Un equipo de ingeniería joven y hambriento, guiado por alguien que conoce AVSA desde adentro. Somos del club.</p>
+    <div class="cards c4">
+      <div class="card" data-reveal data-delay="1"><div class="ico">▣</div><h3>Instrumentos LATAM</h3><p>Lecap, Boncap, Bopreal, ON, AL30/GD30, CEDEARs, MEP/CCL. El producto piensa nativamente en estos instrumentos.</p></div>
+      <div class="card" data-reveal data-delay="2"><div class="ico">⇄</div><h3>Integración local</h3><p>Conexión al back office y a brokers locales. Parsing de PDFs y Excels cuando hace falta. Cada integración, ventaja acumulada.</p></div>
+      <div class="card" data-reveal data-delay="3"><div class="ico">§</div><h3>Compliance argentino</h3><p>CNV, UIF, ARCA. Cada regla que entendemos y automatizamos es una capa que un genérico extranjero no replica.</p></div>
+      <div class="card" data-reveal data-delay="4"><div class="ico">◈</div><h3>Velocidad y cercanía</h3><p>Equipo chico, foco total. Lo que pedís hoy puede estar la semana que viene — no en el backlog de veinte casas.</p></div>
+    </div>
+  </div>
+</section>
+
+<!-- ======================= LA PROPUESTA ======================= -->
+<section id="propuesta" data-title="La propuesta">
+  <div class="wrap">
+    <div class="eyebrow" data-reveal>La propuesta</div>
+    <h2 class="display" data-reveal data-delay="1" style="margin-bottom:44px">AVSA, cliente cero.</h2>
+    <div class="ask">
+      <div data-reveal>
+        <p class="kicker" style="margin-top:0">Ser el primero tiene privilegios. Y a vos, ser el primero, te sale mejor que a nadie.</p>
+        <ul class="asklist" style="margin-top:30px">
+          <li><span class="c">◆</span> <span><b>Pricing preferencial de fundador</b> — el mejor precio que va a tener cualquier cliente, congelado.</span></li>
+          <li><span class="c">◆</span> <span><b>Prioridad absoluta en el roadmap</b> — lo que necesita AVSA se construye primero.</span></li>
+          <li><span class="c">◆</span> <span><b>Implementación a medida y rápida</b> — empezando por desescalar la app a cliente final.</span></li>
+          <li><span class="c">◆</span> <span><b>Soporte directo</b> — con el equipo que construye, no con un call center.</span></li>
+        </ul>
+      </div>
+      <div data-reveal data-delay="1">
+        <div class="mono" style="color:var(--dim);font-size:12px;letter-spacing:.14em;text-transform:uppercase;margin-bottom:18px">Próximos pasos</div>
+        <div class="steps">
+          <div class="step"><h3>Un piloto acotado</h3><p>Tres o cuatro productores de confianza que elija Gustavo, sobre datos reales.</p></div>
+          <div class="step"><h3>Cuatro a seis semanas</h3><p>Vinculación, validación de cálculos con cuentas reales, y capacitación.</p></div>
+          <div class="step"><h3>Decisión con evidencia</h3><p>Medimos tiempo recuperado y satisfacción del productor. Escalamos si convence.</p></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ======================= CIERRE ======================= -->
+<section id="close" data-title="Cierre">
+  <div class="wrap">
+    <div class="eyebrow" style="justify-content:center" data-reveal>Una última cosa</div>
+    <h2 data-reveal data-delay="1">No te pedimos cambiar tus rieles. Te ofrecemos darle a tus asesores la herramienta que hoy no existe — <span class="accent">hecha para AVSA</span>.</h2>
+    <div class="sig" data-reveal data-delay="2">
+      <span><b>GPI</b> · Gomez Pizarro Intelligence</span>
+      <span>×</span>
+      <img src="assets/logo-avsa.png" alt="Argentina Valores" />
+      <span>Confidencial · 2026</span>
+    </div>
+  </div>
+</section>
+
+<script>
+/* progress bar */
+const progress=document.getElementById('progress');
+function onScroll(){
+  const h=document.documentElement;
+  const p=h.scrollTop/(h.scrollHeight-h.clientHeight);
+  progress.style.width=(p*100)+'%';
+}
+document.addEventListener('scroll',onScroll,{passive:true});onScroll();
+
+/* reveal on scroll */
+const io=new IntersectionObserver((es)=>{es.forEach(e=>{if(e.isIntersecting){e.target.classList.add('in');io.unobserve(e.target);}})},{threshold:.12,rootMargin:'0px 0px -8% 0px'});
+document.querySelectorAll('[data-reveal]').forEach(el=>io.observe(el));
+
+/* nav dots */
+const sections=[...document.querySelectorAll('section[data-title]')];
+const dots=document.getElementById('dots');
+sections.forEach((s,i)=>{
+  const a=document.createElement('a');a.href='#'+s.id;
+  a.innerHTML='<span>'+s.dataset.title+'</span>';
+  dots.appendChild(a);
+});
+const dotEls=[...dots.children];
+const spy=new IntersectionObserver((es)=>{es.forEach(e=>{if(e.isIntersecting){const i=sections.indexOf(e.target);dotEls.forEach(d=>d.classList.remove('active'));if(dotEls[i])dotEls[i].classList.add('active');}})},{threshold:.5});
+sections.forEach(s=>spy.observe(s));
+
+/* keyboard section nav */
+function current(){let idx=0,best=1e9;sections.forEach((s,i)=>{const d=Math.abs(s.getBoundingClientRect().top);if(d<best){best=d;idx=i;}});return idx;}
+document.addEventListener('keydown',(e)=>{
+  if(['ArrowDown','PageDown','ArrowRight',' '].includes(e.key)){e.preventDefault();const n=Math.min(current()+1,sections.length-1);sections[n].scrollIntoView({behavior:'smooth'});}
+  if(['ArrowUp','PageUp','ArrowLeft'].includes(e.key)){e.preventDefault();const n=Math.max(current()-1,0);sections[n].scrollIntoView({behavior:'smooth'});}
+});
+
+/* before / after slider */
+(function(){
+  const ba=document.getElementById('ba'),before=document.getElementById('baBefore'),handle=document.getElementById('baHandle');
+  if(!ba)return;
+  let drag=false;
+  function set(x){
+    const r=ba.getBoundingClientRect();
+    let p=(x-r.left)/r.width;p=Math.max(.04,Math.min(.96,p));
+    before.style.clipPath='inset(0 '+(100-p*100)+'% 0 0)';
+    handle.style.left=(p*100)+'%';
+  }
+  set(ba.getBoundingClientRect().left+ba.getBoundingClientRect().width*0.5);
+  const down=()=>drag=true,up=()=>drag=false;
+  handle.addEventListener('pointerdown',down);
+  window.addEventListener('pointerup',up);
+  window.addEventListener('pointermove',(e)=>{if(drag)set(e.clientX);});
+  ba.addEventListener('click',(e)=>{set(e.clientX);});
+})();
+</script>
+</body>
+</html>

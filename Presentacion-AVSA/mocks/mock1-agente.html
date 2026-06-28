@@ -1,0 +1,63 @@
+<!DOCTYPE html><html lang="es"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Mock 1 · Agente en vivo</title>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500&family=Inter:wght@400;500;600;700&family=Geist+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root{--ink:#06080c;--surf:#0e131b;--surf2:#141a24;--line:rgba(255,255,255,.08);--text:#eaeef5;--mut:#94a0b0;--acc:#34e0a1;--acc2:#6ee7ff;--mono:'Geist Mono',ui-monospace,monospace}
+*{margin:0;padding:0;box-sizing:border-box}
+body{background:radial-gradient(120% 90% at 50% -10%,#0d1a18,#06080c 60%);color:var(--text);font-family:'Inter',system-ui,sans-serif;min-height:100vh}
+.bar{display:flex;justify-content:space-between;align-items:center;padding:16px 30px;border-bottom:1px solid var(--line)}
+.bar .b{font-family:var(--mono);font-size:13px;letter-spacing:.16em}.bar .b b{color:var(--acc);font-weight:500}
+.bar .r{display:flex;align-items:center;gap:12px;font-family:var(--mono);font-size:10.5px;letter-spacing:.14em;color:var(--mut);text-transform:uppercase}
+.bar .r img{height:24px;opacity:.9}
+.tag{position:fixed;bottom:16px;right:20px;font-family:var(--mono);font-size:10px;letter-spacing:.14em;color:#5a6472;text-transform:uppercase;border:1px solid var(--line);padding:5px 10px;border-radius:6px}
+.wrap{max-width:880px;margin:0 auto;padding:48px 28px 80px}
+.lbl{font-family:var(--mono);font-size:11px;letter-spacing:.2em;text-transform:uppercase;color:var(--acc);margin-bottom:26px;display:flex;gap:10px;align-items:center}
+.lbl::before{content:"";width:24px;height:1px;background:var(--acc)}
+.umsg{display:flex;justify-content:flex-end;margin-bottom:26px}
+.umsg .b{background:linear-gradient(180deg,#1a2230,#141a24);border:1px solid var(--line);border-radius:16px 16px 4px 16px;padding:15px 20px;max-width:78%;font-size:16px;color:#dfe6ef}
+.amsg{display:flex;gap:16px;align-items:flex-start}
+.av{width:38px;height:38px;border-radius:11px;flex-shrink:0;background:linear-gradient(135deg,var(--acc),var(--acc2));display:flex;align-items:center;justify-content:center;color:#04201a;font-weight:700;font-family:var(--mono);font-size:13px}
+.abody{flex:1}
+.abody>p{font-size:16.5px;line-height:1.55;color:#dde4ee;margin-bottom:18px}
+.abody>p b{color:#fff;font-weight:600}
+.tableC{border:1px solid var(--line);border-radius:14px;overflow:hidden;background:rgba(255,255,255,.018);margin-bottom:18px}
+table{width:100%;border-collapse:collapse;font-size:14.5px}
+th{text-align:left;font-family:var(--mono);font-size:10.5px;letter-spacing:.1em;text-transform:uppercase;color:var(--mut);font-weight:500;padding:13px 18px;background:rgba(255,255,255,.02)}
+td{padding:13px 18px;border-top:1px solid var(--line);color:#d6dde7}
+td.n{font-family:var(--mono);text-align:right}
+td .pos{color:var(--acc)}
+tr:hover td{background:rgba(52,224,161,.04)}
+.action{background:linear-gradient(180deg,rgba(52,224,161,.09),rgba(52,224,161,.03));border:1px solid rgba(52,224,161,.35);border-radius:14px;padding:20px}
+.action .h{font-family:var(--mono);font-size:11px;letter-spacing:.16em;text-transform:uppercase;color:var(--acc);margin-bottom:10px;display:flex;gap:8px;align-items:center}
+.action p{font-size:15.5px;color:#e6edf5;margin-bottom:16px}
+.action p b{color:#fff}
+.btns{display:flex;gap:10px}
+.btns .go{background:var(--acc);color:#04201a;font-weight:600;font-size:14.5px;padding:11px 22px;border-radius:9px;border:none;cursor:pointer}
+.btns .sec{background:transparent;color:var(--text);border:1px solid var(--line);font-size:14.5px;padding:11px 20px;border-radius:9px;cursor:pointer}
+.foot{margin-top:30px;font-size:13px;color:var(--mut);display:flex;gap:8px;align-items:center;font-family:var(--mono)}
+.dot{width:7px;height:7px;border-radius:50%;background:var(--acc);box-shadow:0 0 0 4px rgba(52,224,161,.15)}
+</style></head><body>
+<div class="bar"><div class="b"><b>GPI</b> · agente operativo</div><div class="r">Hecho para <img src="../assets/logo-avsa.png" alt="AVSA"></div></div>
+<div class="wrap">
+  <div class="lbl">El agente no analiza · ejecuta</div>
+  <div class="umsg"><div class="b">¿Qué clientes cobraron el cupón del BPOA7 ayer y cuáles quedaron con saldo sin reinvertir?</div></div>
+  <div class="amsg"><div class="av">GPI</div><div class="abody">
+    <p>Ayer acreditaron cupón del <b>BPOA7</b> <b>23 clientes</b> de tu cartera. De esos, <b>7 quedaron con saldo disponible sin reinvertir</b> (total US$ 84.300). Los ordené por monto:</p>
+    <div class="tableC"><table>
+      <tr><th>Cliente</th><th>Productor</th><th style="text-align:right">Cupón cobrado</th><th style="text-align:right">Saldo disp.</th></tr>
+      <tr><td>M. A. Gauna</td><td>Sucursal Córdoba</td><td class="n">US$ 12.480</td><td class="n"><span class="pos">US$ 21.900</span></td></tr>
+      <tr><td>Estancia La Rosa S.A.</td><td>Sucursal Rosario</td><td class="n">US$ 9.240</td><td class="n"><span class="pos">US$ 18.450</span></td></tr>
+      <tr><td>R. Paniagua</td><td>Sucursal Mar del Plata</td><td class="n">US$ 6.110</td><td class="n"><span class="pos">US$ 14.200</span></td></tr>
+      <tr><td>F. Iturrioz</td><td>Sucursal Córdoba</td><td class="n">US$ 4.870</td><td class="n"><span class="pos">US$ 11.300</span></td></tr>
+      <tr><td>Agro del Centro SRL</td><td>Sucursal Buenos Aires</td><td class="n">US$ 3.920</td><td class="n"><span class="pos">US$ 9.050</span></td></tr>
+    </table></div>
+    <div class="action">
+      <div class="h">◆ El agente propone</div>
+      <p>Redacté <b>7 mensajes de WhatsApp</b> a la marca de AVSA, uno por cliente, sugiriendo reinvertir en <b>Lecap S30S5</b> según su perfil. ¿Los reviso con vos o los envío?</p>
+      <div class="btns"><button class="go">Aprobar y enviar los 7</button><button class="sec">Revisar uno por uno</button></div>
+    </div>
+    <div class="foot"><span class="dot"></span> Listo en 1,8 s · sobre datos de la casa</div>
+  </div></div>
+</div>
+<div class="tag">Mock · datos ilustrativos</div>
+</body></html>

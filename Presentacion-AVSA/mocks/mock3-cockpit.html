@@ -1,0 +1,77 @@
+<!DOCTYPE html><html lang="es"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Mock 3 · Cockpit director (institucional)</title>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600&family=Inter:wght@400;500;600;700&family=Geist+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root{--ink:#0c1b33;--blue:#12graphite;--accent:#0a8f5f;--line:#e7ebf1;--mut:#6b7689;--mono:'Geist Mono',ui-monospace,monospace;--card:#fff;--bg:#f5f7fa}
+*{margin:0;padding:0;box-sizing:border-box}
+body{background:var(--bg);color:var(--ink);font-family:'Inter',system-ui,sans-serif;min-height:100vh}
+.top{display:flex;justify-content:space-between;align-items:center;padding:18px 34px;background:#fff;border-bottom:1px solid var(--line)}
+.top .l{display:flex;align-items:center;gap:14px}
+.logo{width:30px;height:30px;border-radius:8px;background:linear-gradient(135deg,#0c1b33,#234a82);color:#fff;font-family:var(--mono);font-weight:700;font-size:12px;display:flex;align-items:center;justify-content:center}
+.top .ttl{font-weight:600;font-size:15px}.top .ttl span{color:var(--mut);font-weight:400}
+.top .r{display:flex;align-items:center;gap:18px;font-size:13px;color:var(--mut)}
+.top .r .seg{display:flex;border:1px solid var(--line);border-radius:8px;overflow:hidden;font-family:var(--mono);font-size:11px}
+.top .r .seg b{padding:6px 11px;font-weight:500;color:var(--mut)}.top .r .seg b.on{background:var(--ink);color:#fff}
+.wrap{padding:26px 34px;max-width:1280px;margin:0 auto}
+.eyebrow{font-family:var(--mono);font-size:11px;letter-spacing:.16em;text-transform:uppercase;color:var(--mut);margin-bottom:6px}
+h1{font-family:'Fraunces',serif;font-weight:500;font-size:30px;margin-bottom:22px}
+.kpis{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin-bottom:18px}
+.kpi{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:18px 20px}
+.kpi .lab{font-size:12px;color:var(--mut);margin-bottom:8px}
+.kpi .v{font-size:27px;font-weight:600;letter-spacing:-.5px}
+.kpi .d{font-size:12px;margin-top:5px;font-family:var(--mono)}.kpi .d.up{color:var(--accent)}
+.grid{display:grid;grid-template-columns:1.6fr 1fr;gap:16px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:20px}
+.card h3{font-size:15px;font-weight:600;margin-bottom:2px}
+.card .sub{font-size:12px;color:var(--mut);margin-bottom:16px}
+.big{font-size:26px;font-weight:600;letter-spacing:-.5px;margin-bottom:2px}
+.big small{font-family:var(--mono);font-size:13px;color:var(--accent);font-weight:500}
+.rank{display:flex;flex-direction:column}
+.rrow{display:grid;grid-template-columns:18px 1fr auto auto;gap:12px;align-items:center;padding:11px 0;border-top:1px solid var(--line);font-size:13.5px}
+.rrow:first-of-type{border-top:none}
+.rrow .i{font-family:var(--mono);color:var(--mut);font-size:12px}
+.rrow .nm{font-weight:500}.rrow .nm span{display:block;font-size:11px;color:var(--mut);font-weight:400}
+.rrow .au{font-family:var(--mono);font-size:13px;text-align:right}
+.rrow .vr{font-family:var(--mono);font-size:12px;color:var(--accent);text-align:right;min-width:54px}
+.tag{position:fixed;bottom:16px;right:20px;font-family:var(--mono);font-size:10px;letter-spacing:.14em;color:#9aa6b5;text-transform:uppercase;border:1px solid var(--line);padding:5px 10px;border-radius:6px;background:#fff}
+.legend{display:flex;gap:16px;font-size:11.5px;color:var(--mut);margin-top:12px}
+.legend i{display:inline-block;width:9px;height:9px;border-radius:2px;margin-right:5px;vertical-align:middle}
+</style></head><body>
+<div class="top">
+  <div class="l"><div class="logo">GPI</div><div class="ttl">Cockpit del Directorio <span>· Argentina Valores</span></div></div>
+  <div class="r"><div class="seg"><b class="on">ARS</b><b>USD MEP</b><b>USD CCL</b></div><span>Hoy, 22:00 · cierre</span></div>
+</div>
+<div class="wrap">
+  <div class="eyebrow">Vista institucional</div>
+  <h1>Toda la casa, en una pantalla.</h1>
+  <div class="kpis">
+    <div class="kpi"><div class="lab">AUM consolidado</div><div class="v">US$ 142,8M</div><div class="d up">▲ +1,9% en el mes</div></div>
+    <div class="kpi"><div class="lab">Comitentes activos</div><div class="v">3.512</div><div class="d up">▲ +48 en 30 días</div></div>
+    <div class="kpi"><div class="lab">Productores</div><div class="v">35</div><div class="d">4 sucursales · +2 en camino</div></div>
+    <div class="kpi"><div class="lab">Comisiones del mes</div><div class="v">US$ 312,4K</div><div class="d up">▲ +6,1% vs mes ant.</div></div>
+  </div>
+  <div class="grid">
+    <div class="card">
+      <h3>Evolución del AUM</h3><div class="sub">Últimos 12 meses · neto de flujos</div>
+      <div class="big">US$ 142,8M <small>+US$ 11,3M (+8,6%)</small></div>
+      <svg viewBox="0 0 760 220" width="100%" height="220" preserveAspectRatio="none" style="margin-top:8px">
+        <defs><linearGradient id="g" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#0a8f5f" stop-opacity=".22"/><stop offset="1" stop-color="#0a8f5f" stop-opacity="0"/></linearGradient></defs>
+        <path d="M0,170 L63,168 L126,150 L189,158 L252,132 L315,120 L378,128 L441,98 L504,104 L567,78 L630,66 L693,52 L760,40 L760,220 L0,220 Z" fill="url(#g)"/>
+        <path d="M0,170 L63,168 L126,150 L189,158 L252,132 L315,120 L378,128 L441,98 L504,104 L567,78 L630,66 L693,52 L760,40" fill="none" stroke="#0a8f5f" stroke-width="2.5"/>
+      </svg>
+      <div class="legend"><span><i style="background:#0a8f5f"></i>AUM neto</span><span>jul · ago · sep · oct · nov · dic · ene · feb · mar · abr · may · jun</span></div>
+    </div>
+    <div class="card">
+      <h3>Ranking de productores</h3><div class="sub">Por AUM gestionado</div>
+      <div class="rank">
+        <div class="rrow"><span class="i">1</span><span class="nm">Productor · Córdoba<span>412 comitentes</span></span><span class="au">US$ 28,4M</span><span class="vr">+2,4%</span></div>
+        <div class="rrow"><span class="i">2</span><span class="nm">Productor · Rosario<span>388 comitentes</span></span><span class="au">US$ 24,1M</span><span class="vr">+1,8%</span></div>
+        <div class="rrow"><span class="i">3</span><span class="nm">Productor · Bs. As.<span>301 comitentes</span></span><span class="au">US$ 19,7M</span><span class="vr">+3,1%</span></div>
+        <div class="rrow"><span class="i">4</span><span class="nm">Productor · Mar del Plata<span>276 comitentes</span></span><span class="au">US$ 15,2M</span><span class="vr">+0,9%</span></div>
+        <div class="rrow"><span class="i">5</span><span class="nm">Productor · Córdoba<span>244 comitentes</span></span><span class="au">US$ 12,8M</span><span class="vr">+1,5%</span></div>
+      </div>
+    </div>
+  </div>
+</div>
+<div class="tag">Mock · datos ilustrativos</div>
+</body></html>

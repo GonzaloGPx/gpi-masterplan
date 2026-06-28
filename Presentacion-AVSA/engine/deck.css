@@ -1,0 +1,206 @@
+/* ============================================================
+   GPI · Motor de presentación (Brand Book GPI)
+   Verde único #3C7A4B · base crema #FAFAF7 · tinta #0A0A0A
+   General Sans (display/body) + JetBrains Mono (datos/eyebrows)
+   ============================================================ */
+@import url('https://api.fontshare.com/v2/css?f[]=general-sans@400,500,600,700&f[]=jetbrains-mono@400,500&display=swap');
+
+:root{
+  /* primitivas de marca */
+  --bg:#FAFAF7;          /* crema base */
+  --surface:#FFFFFF;
+  --surface-2:#F0F0EC;
+  --ink:#0A0A0A;
+  --ink-soft:#1A1A18;
+  --mut:#6B6B6B;
+  --soft:#9A9A92;
+  --line:#E6E6DF;        /* hairline */
+  --line-strong:#D8D8CF;
+  /* verde único */
+  --brand:#3C7A4B;
+  --brand-deep:#2E5E39;
+  --brand-ink:#0C2316;
+  --brand-soft:#E9F0EA;  /* tinte verde sobre crema */
+  /* semánticos */
+  --red:#E54B4B;
+  --warn:#C8861A;
+  /* tipografía */
+  --mono:'JetBrains Mono',ui-monospace,SFMono-Regular,Menlo,monospace;
+  --sans:'General Sans',system-ui,-apple-system,Segoe UI,sans-serif;
+}
+
+*{margin:0;padding:0;box-sizing:border-box}
+html,body{height:100%}
+body{
+  background:var(--bg);color:var(--ink);
+  font-family:var(--sans);font-weight:400;
+  overflow:hidden;
+  -webkit-font-smoothing:antialiased;text-rendering:optimizeLegibility;
+}
+
+/* ---------- escenas ---------- */
+.scene{
+  position:absolute;inset:0;opacity:0;visibility:hidden;
+  transition:opacity .7s ease;
+  display:flex;flex-direction:column;justify-content:center;align-items:center;
+  padding:84px 56px 108px;text-align:center;
+}
+.scene.active{opacity:1;visibility:visible}
+[data-anim]{
+  opacity:0;transform:translateY(15px);
+  transition:opacity .7s cubic-bezier(.2,.7,.2,1),transform .7s cubic-bezier(.2,.7,.2,1);
+}
+[data-anim].in{opacity:1;transform:none}
+
+/* ---------- eyebrow (mono mayúscula + punto verde) ---------- */
+.eyebrow{
+  font-family:var(--mono);font-size:12px;font-weight:500;
+  letter-spacing:.2em;text-transform:uppercase;color:var(--brand);
+  margin-bottom:18px;display:flex;gap:11px;align-items:center;justify-content:center;
+}
+.eyebrow::before{
+  content:"";width:7px;height:7px;border-radius:50%;
+  background:var(--brand);box-shadow:0 0 0 3px rgba(60,122,75,.16),0 0 10px rgba(60,122,75,.5);
+}
+
+/* ---------- titulares ---------- */
+h1{font-family:var(--sans);font-weight:600;letter-spacing:-.02em;line-height:1.05;color:var(--ink)}
+.scene--title h1{font-size:clamp(38px,5.2vw,68px);max-width:18ch}
+.scene--title .sub{
+  font-size:clamp(17px,1.8vw,22px);color:var(--mut);max-width:62ch;
+  margin-top:22px;line-height:1.5;font-weight:400;
+}
+.scene--title .sub b{color:var(--ink);font-weight:600}
+
+/* ---------- caption bajo el frame ---------- */
+.cap{
+  font-size:clamp(15px,1.55vw,19px);color:var(--mut);max-width:78ch;
+  margin-top:24px;line-height:1.55;font-weight:400;
+}
+.cap b{color:var(--ink);font-weight:600}
+.cap .g{color:var(--brand);font-weight:600}
+
+/* ---------- chips (pestañas/recorrido) ---------- */
+.chips{display:flex;flex-wrap:wrap;gap:9px;margin-top:34px;justify-content:center;max-width:80ch}
+.chip{
+  font-family:var(--mono);font-size:12.5px;letter-spacing:.01em;
+  background:var(--surface);border:1px solid var(--line);border-radius:100px;
+  padding:7px 14px;color:var(--mut);
+}
+.chip.on{background:var(--brand);color:#fff;border-color:var(--brand)}
+.chip.done{color:var(--brand);border-color:var(--brand-soft);background:var(--brand-soft)}
+
+/* ---------- frame con captura real ---------- */
+.frame{
+  position:relative;width:min(1140px,90vw);border-radius:14px;overflow:hidden;
+  border:1px solid var(--line-strong);
+  box-shadow:0 36px 80px -40px rgba(10,10,10,.42),0 2px 0 rgba(255,255,255,.6) inset;
+  background:var(--surface);
+}
+.frame img{display:block;width:100%;height:auto}
+
+/* doble frame lado a lado (comparaciones) */
+.frames{display:flex;gap:22px;width:min(1180px,92vw);align-items:flex-start}
+.frames .frame{width:100%}
+
+/* ---------- callouts ---------- */
+.callout{
+  position:absolute;border:2.5px solid var(--brand);border-radius:10px;
+  animation:pulse 2.2s ease-in-out infinite;pointer-events:none;
+}
+.callout--alert{border-color:var(--red);animation:pulser 2.2s ease-in-out infinite}
+.callout .lab{
+  position:absolute;top:-30px;left:-2px;
+  background:var(--brand);color:#fff;font-family:var(--mono);font-size:10.5px;
+  font-weight:500;letter-spacing:.03em;padding:4px 9px;border-radius:6px;white-space:nowrap;
+}
+.callout.bot .lab,.callout .lab.bot{top:auto;bottom:-30px}
+.callout.rgt .lab,.callout .lab.rgt{left:auto;right:-2px}
+.callout--alert .lab{background:var(--red)}
+/* label anclada dentro de la caja (no se sale del frame en bordes) */
+.callout .lab.in{top:6px;bottom:auto;left:6px;right:auto}
+.callout .lab.in-rgt{top:6px;bottom:auto;left:auto;right:6px}
+.callout .lab.in-bot{top:auto;bottom:6px;left:6px;right:auto}
+.callout .lab.in-botrgt{top:auto;bottom:6px;left:auto;right:6px}
+@keyframes pulse{
+  0%,100%{box-shadow:0 0 0 3px rgba(60,122,75,.16),0 0 20px rgba(60,122,75,.28)}
+  50%{box-shadow:0 0 0 5px rgba(60,122,75,.24),0 0 34px rgba(60,122,75,.46)}
+}
+@keyframes pulser{
+  0%,100%{box-shadow:0 0 0 3px rgba(229,75,75,.16),0 0 20px rgba(229,75,75,.28)}
+  50%{box-shadow:0 0 0 5px rgba(229,75,75,.26),0 0 34px rgba(229,75,75,.48)}
+}
+
+/* ---------- click (recuadro) + viñeta de resultado FUERA del frame + conector ---------- */
+/* .stage envuelve al .frame y permite que las viñetas vivan en el margen, fuera de la captura. */
+.stage{position:relative;width:min(1140px,90vw)}
+.stage .frame{width:100%}
+
+/* .clickbox: recuadro que marca el elemento sobre el que se hace click (dentro del frame) */
+.clickbox{
+  position:absolute;border:2.5px solid var(--brand);border-radius:7px;
+  box-shadow:0 0 0 4px rgba(60,122,75,.12);
+  animation:pulse 2.2s ease-in-out infinite;z-index:7;pointer-events:none;
+}
+
+/* .inset: viñeta del resultado, anclada en el margen (fuera del frame) */
+.stage .inset{
+  position:absolute;width:300px;z-index:8;background:var(--surface);
+  border:1px solid var(--line-strong);border-radius:12px;overflow:hidden;
+  box-shadow:0 26px 64px -26px rgba(10,10,10,.55);
+}
+.stage .inset.rgt{left:calc(100% + 24px)}
+.stage .inset.lft{right:calc(100% + 24px)}
+.stage .inset.sm{width:248px}
+.stage .inset img{display:block;width:100%;height:auto}
+.stage .inset .ilab{
+  font-family:var(--mono);font-size:10px;letter-spacing:.04em;
+  background:var(--brand);color:#fff;padding:5px 10px;display:block;
+}
+
+/* .conn: línea punteada del recuadro a la viñeta (horizontal; pos por inline) */
+.conn{
+  position:absolute;z-index:7;height:0;border-top:2px dashed var(--brand);
+  opacity:.7;pointer-events:none;
+}
+.conn::after{content:"";position:absolute;right:-3px;top:-4px;width:7px;height:7px;border-radius:50%;background:var(--brand)}
+
+/* ---------- brand chrome (inyectado por deck.js) ---------- */
+.brandbar{
+  position:fixed;top:24px;left:30px;z-index:30;display:flex;align-items:center;gap:12px;
+}
+.wordmark{display:flex;align-items:center;gap:8px;font-family:var(--sans);font-weight:600;font-size:15px;letter-spacing:-.01em;color:var(--ink)}
+.wordmark .dot{width:9px;height:9px;border-radius:50%;background:var(--brand);box-shadow:0 0 0 3px rgba(60,122,75,.16),0 0 10px rgba(60,122,75,.55)}
+.brandbar .sep{width:1px;height:16px;background:var(--line-strong)}
+.brandbar .sec{font-family:var(--mono);font-size:11px;letter-spacing:.16em;text-transform:uppercase;color:var(--mut)}
+
+.forb{
+  position:fixed;top:24px;right:30px;z-index:30;display:flex;align-items:center;gap:10px;
+  font-family:var(--mono);font-size:10px;letter-spacing:.16em;color:var(--soft);text-transform:uppercase;
+}
+.forb img{height:24px;opacity:.92}
+
+/* ---------- HUD ---------- */
+.hud{
+  position:fixed;left:50%;bottom:26px;transform:translateX(-50%);z-index:40;
+  display:flex;align-items:center;gap:13px;background:rgba(255,255,255,.92);
+  backdrop-filter:blur(8px);border:1px solid var(--line);border-radius:100px;
+  padding:8px 16px;box-shadow:0 14px 40px -18px rgba(10,10,10,.4);
+}
+.ctrl{
+  width:30px;height:30px;border-radius:50%;display:flex;align-items:center;justify-content:center;
+  cursor:pointer;color:var(--ink);font-size:12px;border:1px solid var(--line);user-select:none;
+  transition:background .15s,border-color .15s;
+}
+.ctrl:hover{background:var(--brand-soft);border-color:var(--brand-soft)}
+.progress{width:230px;height:4px;background:var(--surface-2);border-radius:3px;overflow:hidden}
+#bar{height:100%;width:0;background:var(--brand);border-radius:3px;transition:width .08s linear}
+.counter{font-family:var(--mono);font-size:11px;color:var(--soft);min-width:50px;text-align:center}
+
+.tag{position:fixed;bottom:28px;left:30px;z-index:40;font-family:var(--mono);font-size:10px;letter-spacing:.14em;color:var(--soft);text-transform:uppercase}
+.hint{position:fixed;bottom:28px;right:30px;z-index:40;font-family:var(--mono);font-size:10.5px;color:var(--soft)}
+
+@media (max-width:720px){
+  .brandbar .sec,.forb,.hint{display:none}
+  .scene{padding:70px 22px 100px}
+}

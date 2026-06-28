@@ -1,0 +1,99 @@
+<!DOCTYPE html><html lang="es"><head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>GPI · Recorrido por la plataforma — para Argentina Valores</title>
+<link rel="stylesheet" href="../engine/deck.css">
+<style>
+  body{overflow:auto;min-height:100vh;display:flex;flex-direction:column}
+  .wrap{max-width:1140px;margin:0 auto;padding:88px 40px 80px;width:100%}
+  .hero .eyebrow{justify-content:flex-start}
+  .hero h1{font-size:clamp(34px,4.4vw,58px);max-width:20ch}
+  .hero p{font-size:clamp(16px,1.7vw,20px);color:var(--mut);max-width:64ch;margin-top:18px;line-height:1.55}
+  .grid{display:grid;grid-template-columns:repeat(3,1fr);gap:18px;margin-top:52px}
+  @media (max-width:900px){.grid{grid-template-columns:1fr}}
+  .card{
+    position:relative;display:flex;flex-direction:column;gap:10px;
+    background:var(--surface);border:1px solid var(--line);border-radius:14px;
+    padding:24px 22px 22px;text-decoration:none;color:inherit;min-height:168px;
+    transition:transform .18s,box-shadow .18s,border-color .18s;
+  }
+  .card.live:hover{transform:translateY(-3px);box-shadow:0 22px 50px -28px rgba(10,10,10,.4);border-color:var(--brand-soft)}
+  .card .num{font-family:var(--mono);font-size:11px;letter-spacing:.16em;color:var(--soft)}
+  .card h3{font-family:var(--sans);font-weight:600;font-size:21px;letter-spacing:-.01em;display:flex;align-items:center;gap:9px}
+  .card h3 .dot{width:8px;height:8px;border-radius:50%;background:var(--brand);box-shadow:0 0 0 3px rgba(60,122,75,.16),0 0 9px rgba(60,122,75,.5)}
+  .card p{font-size:13.5px;color:var(--mut);line-height:1.5;margin-top:2px}
+  .card .tabs{margin-top:auto;font-family:var(--mono);font-size:10.5px;letter-spacing:.02em;color:var(--soft)}
+  .card .go{position:absolute;top:22px;right:22px;font-family:var(--mono);font-size:11px;color:var(--brand)}
+  .card.soon{opacity:.62}
+  .card.soon h3 .dot{background:var(--soft);box-shadow:none}
+  .card.soon .go{color:var(--warn)}
+  .foot{margin-top:46px;font-family:var(--mono);font-size:11px;letter-spacing:.04em;color:var(--soft);display:flex;justify-content:space-between;flex-wrap:wrap;gap:12px}
+  .hint2{font-family:var(--mono);font-size:11px;color:var(--mut);margin-top:8px}
+</style>
+</head>
+<body>
+<div class="brandbar"><span class="wordmark"><span class="dot"></span>GPI</span><span class="sep"></span><span class="sec">Recorrido por la plataforma</span></div>
+<div class="forb">hecho para <img src="../assets/logo-avsa.png" alt="Argentina Valores"></div>
+
+<div class="wrap">
+  <div class="hero">
+    <div class="eyebrow">Para Argentina Valores</div>
+    <h1>La plataforma, módulo por módulo.</h1>
+    <p>Seis módulos, un solo norte: facilitarle al productor el manejo de la información y el cumplimiento de su trabajo. Cada recorrido corre sobre <b style="color:var(--ink)">datos reales de la casa</b> y se reproduce solo. <span style="color:var(--mut)">(Espacio: pausar · ← → : moverse)</span></p>
+  </div>
+
+  <div class="grid">
+    <a class="card live" href="./01-dashboard.html">
+      <span class="go">Ver ▶</span>
+      <span class="num">01</span>
+      <h3><span class="dot"></span>Dashboard</h3>
+      <p>Su día, concentrado en una sola pantalla: la foto del negocio y lo último que pasó.</p>
+      <span class="tabs">AUM · cuentas · novedades · mi día</span>
+    </a>
+
+    <a class="card live" href="./02-novedades.html">
+      <span class="go">Ver ▶</span>
+      <span class="num">02</span>
+      <h3><span class="dot"></span>Novedades</h3>
+      <p>El detalle de la cartera y lo que el cliente necesita — cada cosa, una oportunidad.</p>
+      <span class="tabs">Clientes · Mercado</span>
+    </a>
+
+    <a class="card live" href="./03-agenda.html">
+      <span class="go">Ver ▶</span>
+      <span class="num">03</span>
+      <h3><span class="dot"></span>Agenda</h3>
+      <p>Calendario y tareas en un lugar, sincronizados con Google Calendar de los dos lados.</p>
+      <span class="tabs">Calendario · Google · tareas</span>
+    </a>
+
+    <a class="card live" href="./04-clientes-360.html">
+      <span class="go">Ver ▶</span>
+      <span class="num">04</span>
+      <h3><span class="dot"></span>Clientes 360°</h3>
+      <p>El cliente entero en una pantalla, y un copiloto que avisa cuando algo no cierra.</p>
+      <span class="tabs">KYC · Posiciones · Movimientos · Gráficos · Análisis · Informes · Conversation · WhatsApp</span>
+    </a>
+
+    <a class="card live" href="./05-business-intelligence.html">
+      <span class="go">Ver ▶</span>
+      <span class="num">05</span>
+      <h3><span class="dot"></span>Business Intelligence</h3>
+      <p>La inteligencia de negocio: detectar, priorizar y medir. Sin candados sobre tu negocio.</p>
+      <span class="tabs">Segmentación · Oportunidades · Campañas · Clientes por Especie · Métricas</span>
+    </a>
+
+    <a class="card live" href="./06-herramientas.html">
+      <span class="go">Ver ▶</span>
+      <span class="num">06</span>
+      <h3><span class="dot"></span>Herramientas</h3>
+      <p>Calculadoras de renta fija, redistribución de cartera y todas las conexiones del día a día.</p>
+      <span class="tabs">Calculadoras · Redistribución · Integraciones · Tablas</span>
+    </a>
+  </div>
+
+  <div class="foot">
+    <span>GPI — Gomez Pizarro · recorrido de producto</span>
+    <span>6 de 6 listos · recorrido completo</span>
+  </div>
+</div>
+</body></html>
