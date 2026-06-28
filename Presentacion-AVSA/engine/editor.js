@@ -39,6 +39,7 @@
     <button class="gpi-ed-btn" data-act="photo">Cambiar foto</button>
     <button class="gpi-ed-btn" data-act="del-photo">Quitar foto</button>
     <button class="gpi-ed-btn" data-act="add-scene">+ Escena</button>
+    <button class="gpi-ed-btn danger" data-act="del-scene">Borrar escena</button>
     <span class="sp"></span>
     <span class="paste-hint">Ctrl+V pega en la viñeta/foto bajo el cursor · autoguardado</span>
     <button class="gpi-ed-btn" data-act="copy">Copiar escena</button>
@@ -461,6 +462,18 @@
     showScene(curIdx + 1);
     toast('Escena nueva agregada después de la actual');
   }
+  function delScene(){
+    const list = scenesList();
+    if(list.length <= 1){ toast('No podés borrar la única escena'); return; }
+    const idx = curIdx, sec = list[idx];
+    const title = (sec.querySelector('.eyebrow, h1') || {}).textContent || ('escena ' + (idx+1));
+    if(!confirm('¿Borrar la escena ' + (idx+1) + ' de ' + list.length + ' («' + title.trim().slice(0,40) + '»)?\nQuedará guardada en el autoguardado por si te arrepentís.')) return;
+    deselect();
+    sec.remove();
+    if(window.GPIDeck && GPIDeck.refresh) GPIDeck.refresh();
+    showScene(Math.min(idx, scenesList().length - 1));
+    toast('Escena borrada · ' + scenesList().length + ' escenas');
+  }
 
   /* ---------------- texto editable (caption, títulos) ---------------- */
   const EDITABLE_SEL = '.cap, .scene--title .sub, .scene--title h1, .eyebrow, .chip, .ilab';
@@ -633,6 +646,7 @@
       case 'photo': pickPhoto(ensureFrameImg()); break;
       case 'del-photo': delPhoto(); break;
       case 'add-scene': addScene(); break;
+      case 'del-scene': delScene(); break;
       case 'copy': copyScene(); break;
       case 'download': download(); break;
       case 'save': saveToFile(); break;
