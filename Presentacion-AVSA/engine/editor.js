@@ -16,6 +16,8 @@
   const clamp = (v,a,b)=>Math.max(a,Math.min(b,v));
   const scenesList = ()=>[...document.querySelectorAll('.scene')];
   let editing = false, curIdx = 0, sel = null;
+  let lastMouse = { x:-1, y:-1 };
+  window.addEventListener('mousemove', e=>{ lastMouse.x = e.clientX; lastMouse.y = e.clientY; }, { passive:true });
 
   /* ---------------- UI: barra superior + panel + toast ---------------- */
   const bar = document.createElement('div');
@@ -38,7 +40,7 @@
     <button class="gpi-ed-btn" data-act="del-photo">Quitar foto</button>
     <button class="gpi-ed-btn" data-act="add-scene">+ Escena</button>
     <span class="sp"></span>
-    <span class="paste-hint">Ctrl+V pega imagen · autoguardado activo</span>
+    <span class="paste-hint">Ctrl+V pega en la viñeta/foto bajo el cursor · autoguardado</span>
     <button class="gpi-ed-btn" data-act="copy">Copiar escena</button>
     <button class="gpi-ed-btn" data-act="download">Descargar copia</button>
     <button class="gpi-ed-btn pri" data-act="save">Guardar en archivo</button>
@@ -372,12 +374,30 @@
     toast('Foto quitada · “Cambiar foto” o Ctrl+V para poner otra');
   }
   // aplica un Blob de imagen (de archivo o del portapapeles) a un <img>, incrustándolo en base64
-  function applyImageBlob(blob, img){
+  function applyImageBlob(blob, img, where){
     if(!blob || !img) return;
     img.src = URL.createObjectURL(blob);
     const r = new FileReader();
-    r.onload = ()=>{ img.dataset.edExportSrc = r.result; toast('Imagen pegada e incrustada en el HTML'); };
+    r.onload = ()=>{ img.dataset.edExportSrc = r.result; toast('Imagen pegada en ' + (where || 'la foto') + ' ✓'); };
     r.readAsDataURL(blob);
+  }
+  // asegura un <img> dentro de un contenedor (viñeta o frame); lo crea si falta
+  function ensureImgIn(box){
+    let img = box.querySelector('img');
+    if(!img){ img = document.createElement('img'); img.alt = ''; box.appendChild(img); }
+    return img;
+  }
+  // a dónde va la imagen pegada: 1) lo que esté bajo el cursor · 2) viñeta seleccionada · 3) foto de la escena
+  function pasteTarget(){
+    if(lastMouse.x >= 0){
+      const at = document.elementFromPoint(lastMouse.x, lastMouse.y);
+      if(at){
+        const inset = at.closest('.inset'); if(inset) return { img: ensureImgIn(inset), where: 'la viñeta' };
+        const frame = at.closest('.frame'); if(frame) return { img: ensureImgIn(frame), where: 'la foto de la escena' };
+      }
+    }
+    if(sel && sel.classList.contains('inset')) return { img: sel.querySelector('img'), where: 'la viñeta' };
+    return { img: ensureFrameImg(), where: 'la foto de la escena' };
   }
   function addBox(type){
     const f = curFrame(); if(!f){ toast('Esta escena no tiene foto para marcar'); return; }
@@ -471,7 +491,7 @@
   function cleanHead(){
     return [...document.head.children].filter(n=>{
       const ref = (n.getAttribute && (n.getAttribute('href')||n.getAttribute('src'))) || '';
-      return !/editor\.(css|js)/.test(ref);
+      return !/(editor|nav)\.(css|js)/.test(ref);
     }).map(n=>n.outerHTML).join('\n');
   }
   function bodyAttrs(){
@@ -517,6 +537,8 @@
     mo.observe(document.body, { subtree:true, childList:true, attributes:true, characterData:true, attributeFilter:['style','class'] });
   }
   function stopAutosave(){ autosaveOn = false; if(mo) mo.disconnect(); clearTimeout(saveT); }
+  // flush sincrónico antes de recargar/cerrar: no perder los últimos cambios
+  window.addEventListener('beforeunload', ()=>{ if(editing && autosaveOn){ clearTimeout(saveT); autosave(); } });
   function readSaved(){ try{ return JSON.parse(localStorage.getItem(LSKEY) || 'null'); }catch(e){ return null; } }
   function restoreSnapshot(html){
     deselect();
@@ -530,30 +552,40 @@
     showScene(0);
     toast('Cambios restaurados');
   }
+  let pendingRestore = null;   // copia EN MEMORIA de la versión guardada, por si la querés recuperar
   function maybeOfferRestore(){
     const saved = readSaved();
     if(saved && saved.html && saved.html !== snapshot()){
+      pendingRestore = saved;
       const dt = new Date(saved.when);
       document.getElementById('gpiRestoreTxt').textContent =
-        'Hay cambios sin guardar de las ' + dt.toLocaleTimeString() + '. ¿Restaurar?';
+        'Versión guardada de las ' + dt.toLocaleTimeString() + ' · “Restaurar” reemplaza lo de ahora';
       restoreBar.style.display = 'flex';
-      // no arrancar el autoguardado hasta resolver, para no pisar el snapshot
-    } else { startAutosave(); }
+    } else { pendingRestore = null; }
+    startAutosave();   // SIEMPRE — así lo que edites ahora queda protegido aunque ignores el aviso
   }
   document.getElementById('gpiRestoreYes').onclick = ()=>{
-    const s = readSaved(); restoreBar.style.display = 'none';
-    if(s && s.html) restoreSnapshot(s.html);
-    startAutosave();
+    restoreBar.style.display = 'none';
+    if(pendingRestore && pendingRestore.html) restoreSnapshot(pendingRestore.html);  // usa la copia en memoria
+    pendingRestore = null;
   };
   document.getElementById('gpiRestoreNo').onclick = ()=>{
     restoreBar.style.display = 'none';
-    try{ localStorage.removeItem(LSKEY); }catch(e){}
-    startAutosave();
+    pendingRestore = null;   // el autoguardado de esta sesión sigue valiendo
   };
 
   let fileHandle = null;
   async function saveToFile(){
     const html = buildDoc();
+    // 1) servido por el server local (abrir-editor.bat / node serve.js) → sobrescribe el .html REAL del demo
+    if(location.protocol === 'http:' || location.protocol === 'https:'){
+      try{
+        const res = await fetch('/__save?path=' + encodeURIComponent(location.pathname),
+          { method:'POST', headers:{ 'Content-Type':'text/html' }, body: html });
+        if(res.ok){ try{ localStorage.removeItem(LSKEY); }catch(e){} toast('Guardado en el archivo del demo ✓ — definitivo'); return; }
+      }catch(e){ /* no hay endpoint de guardado: probamos los otros métodos */ }
+    }
+    // 2) File System Access API (sólo anda fuera de file://)
     if(window.showSaveFilePicker){
       try{
         if(!fileHandle){
@@ -564,16 +596,12 @@
         }
         const w = await fileHandle.createWritable(); await w.write(html); await w.close();
         try{ localStorage.removeItem(LSKEY); }catch(e){}
-        toast('Guardado en el archivo ✓ — ya es definitivo');
-        return;
-      }catch(e){
-        if(e && e.name === 'AbortError') return;        // canceló el diálogo
-        toast('El navegador no deja escribir el archivo · te descargo una copia');
-      }
-    } else {
-      toast('Tu navegador no soporta guardado directo · te descargo una copia');
+        toast('Guardado en el archivo ✓'); return;
+      }catch(e){ if(e && e.name === 'AbortError') return; }   // canceló el diálogo
     }
-    download();   // fallback: descargás y reemplazás el archivo a mano
+    // 3) último recurso (típico de file://): descarga una copia
+    toast('Estás en file:// — no puedo escribir el demo. Abrí con “abrir-editor.bat” para guardar in-place. Te descargo una copia.');
+    download();
   }
 
   function copyScene(){
@@ -656,8 +684,8 @@
     for(const it of items){
       if(it.type && it.type.indexOf('image') === 0){
         const blob = it.getAsFile(); if(!blob) continue;
-        const target = (sel && sel.classList.contains('inset')) ? sel.querySelector('img') : ensureFrameImg();
-        applyImageBlob(blob, target);
+        const tg = pasteTarget();
+        applyImageBlob(blob, tg.img, tg.where);
         e.preventDefault();
         return;
       }

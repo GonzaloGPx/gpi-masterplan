@@ -12,7 +12,11 @@ body.gpi-edit .hint,
 body.gpi-edit .tag{display:none !important}
 
 /* todo lo animado, visible y quieto para poder acomodarlo */
-body.gpi-edit [data-anim]{opacity:1 !important;transform:none !important;transition:none !important}
+body.gpi-edit [data-anim]{opacity:1 !important;transition:none !important}
+/* neutralizar la animación de entrada (translateY) — pero NO los conectores, que usan rotate() */
+body.gpi-edit [data-anim]:not(.conn){transform:none !important}
+/* conectores: default sin offset; el rotate() inline del ángulo elegido lo pisa y SÍ se ve girar */
+body.gpi-edit .conn{transform:rotate(0deg)}
 body.gpi-edit .callout,
 body.gpi-edit .clickbox,
 body.gpi-edit .conn{animation:none !important}

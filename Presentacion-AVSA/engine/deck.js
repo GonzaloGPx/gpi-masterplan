@@ -36,6 +36,13 @@
     <div class="hint">Espacio: pausar · ← → : moverse · <b>E</b>: editar</div>`;
   body.insertAdjacentHTML('beforeend', chrome);
 
+  /* ---- menú de navegación entre módulos (sidebar estilo plataforma GPI) ---- */
+  (function injectNav(){
+    const base = ((SELF && SELF.src) ? SELF.src : '../engine/deck.js').replace(/deck\.js.*$/,'');
+    const css = document.createElement('link'); css.rel = 'stylesheet'; css.href = base + 'nav.css'; document.head.appendChild(css);
+    const js = document.createElement('script'); js.src = base + 'nav.js'; document.body.appendChild(js);
+  })();
+
   /* ---- timeline ---- */
   let scenes = [...document.querySelectorAll('.scene')];
   const DEFAULT = 15;
