@@ -39,8 +39,9 @@
   /* ---- menú de navegación entre módulos (sidebar estilo plataforma GPI) ---- */
   (function injectNav(){
     const base = ((SELF && SELF.src) ? SELF.src : '../engine/deck.js').replace(/deck\.js.*$/,'');
-    const css = document.createElement('link'); css.rel = 'stylesheet'; css.href = base + 'nav.css'; document.head.appendChild(css);
-    const js = document.createElement('script'); js.src = base + 'nav.js'; document.body.appendChild(js);
+    const v = '?v=' + Date.now();   // evita que quede cacheada una versión vieja del menú
+    const css = document.createElement('link'); css.rel = 'stylesheet'; css.href = base + 'nav.css' + v; document.head.appendChild(css);
+    const js = document.createElement('script'); js.src = base + 'nav.js' + v; document.body.appendChild(js);
   })();
 
   /* ---- timeline ---- */
@@ -117,11 +118,12 @@
     if(editorLoaded){ window.dispatchEvent(new CustomEvent('gpi-edit-toggle')); return; }
     editorLoaded = true;
     const base = ((SELF && SELF.src) ? SELF.src : '../engine/deck.js').replace(/deck\.js.*$/,'');
+    const v = '?v=' + Date.now();
     const css = document.createElement('link');
-    css.rel = 'stylesheet'; css.href = base + 'editor.css';
+    css.rel = 'stylesheet'; css.href = base + 'editor.css' + v;
     document.head.appendChild(css);
     const js = document.createElement('script');
-    js.src = base + 'editor.js';
+    js.src = base + 'editor.js' + v;
     document.body.appendChild(js);
   }
 

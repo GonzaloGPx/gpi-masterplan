@@ -8,6 +8,17 @@
 const http = require('http');
 const fs   = require('fs');
 const path = require('path');
+const os   = require('os');
+
+// IPs de esta máquina en la red local (para abrir desde otra compu)
+function lanIPs(){
+  const out = [];
+  const ifaces = os.networkInterfaces();
+  for(const name in ifaces){
+    for(const i of ifaces[name]){ if(i.family === 'IPv4' && !i.internal) out.push(i.address); }
+  }
+  return out;
+}
 
 const ROOT = __dirname;                 // carpeta Presentacion-AVSA
 const PORT = process.env.PORT || 8123;
@@ -59,8 +70,9 @@ const server = http.createServer((req, res)=>{
   });
 });
 
-server.listen(PORT, ()=>{
+server.listen(PORT, '0.0.0.0', ()=>{
   console.log('\n  GPI · editor de demos corriendo');
-  console.log('  Abrí:  http://localhost:' + PORT + '/demos/index.html');
-  console.log('  (Ctrl+C para detener)\n');
+  console.log('  En ESTA compu:     http://localhost:' + PORT + '/demos/index.html');
+  lanIPs().forEach(ip => console.log('  Desde otra compu:  http://' + ip + ':' + PORT + '/demos/index.html'));
+  console.log('  (Ctrl+C para detener · firewall: permitir Node en la red local)\n');
 });
