@@ -1,0 +1,147 @@
+/* ============================================================
+   GPI · Editor visual de demos  (engine/editor.js)
+   Activá con la tecla "E". Estilos del modo edición:
+   barras, selección, handles de resize, toasts.
+   No afecta el modo presentación (todo va bajo body.gpi-edit).
+   ============================================================ */
+
+/* mientras se edita: liberar el scroll vertical y frenar animaciones */
+body.gpi-edit{overflow:auto}
+body.gpi-edit .hud,
+body.gpi-edit .hint,
+body.gpi-edit .tag{display:none !important}
+
+/* todo lo animado, visible y quieto para poder acomodarlo */
+body.gpi-edit [data-anim]{opacity:1 !important;transform:none !important;transition:none !important}
+body.gpi-edit .callout,
+body.gpi-edit .clickbox,
+body.gpi-edit .conn{animation:none !important}
+body.gpi-edit .scene{transition:none !important}
+
+/* dejar la escena activa scrolleable y con aire para las barras */
+body.gpi-edit .scene.active{padding-top:120px;padding-bottom:140px;justify-content:flex-start}
+
+/* en edición el frame NO recorta: así se ven los handles de resize y las etiquetas externas */
+body.gpi-edit .frame{overflow:visible}
+
+/* ---- elementos editables: clickeables y con cursor de mover ---- */
+body.gpi-edit .callout,
+body.gpi-edit .clickbox,
+body.gpi-edit .inset,
+body.gpi-edit .conn{pointer-events:auto;cursor:move}
+body.gpi-edit .callout .lab{pointer-events:auto;cursor:text}
+
+/* contorno tenue para ver TODAS las cajas, incluso las vacías */
+body.gpi-edit .callout{outline:1px dashed rgba(60,122,75,.45);outline-offset:-2px}
+body.gpi-edit .clickbox{outline:1px dashed rgba(60,122,75,.6)}
+body.gpi-edit .conn{outline:1px dashed rgba(60,122,75,.4)}
+
+/* seleccionado */
+body.gpi-edit .gpi-ed-sel{outline:2px solid var(--brand) !important;outline-offset:1px;z-index:50 !important}
+body.gpi-edit .callout--alert.gpi-ed-sel{outline-color:var(--red) !important}
+body.gpi-edit .callout--warn.gpi-ed-sel{outline-color:var(--warn) !important}
+
+/* handle de resize (esquina inferior derecha) */
+.gpi-ed-handle{
+  position:absolute;right:-7px;bottom:-7px;width:14px;height:14px;
+  background:#fff;border:2px solid var(--brand);border-radius:3px;
+  cursor:nwse-resize;z-index:60;box-shadow:0 1px 4px rgba(0,0,0,.3);
+}
+.callout--alert > .gpi-ed-handle{border-color:var(--red)}
+.callout--warn  > .gpi-ed-handle{border-color:var(--warn)}
+
+/* lectura de medidas flotante sobre el seleccionado */
+.gpi-ed-readout{
+  position:absolute;top:-22px;right:0;
+  font-family:var(--mono);font-size:10px;color:#fff;background:rgba(10,10,10,.82);
+  padding:2px 6px;border-radius:5px;white-space:nowrap;z-index:61;pointer-events:none;
+}
+
+/* texto editable resaltado */
+body.gpi-edit [contenteditable="true"]{
+  outline:1px dashed rgba(60,122,75,.5);outline-offset:3px;border-radius:3px;cursor:text;
+}
+body.gpi-edit [contenteditable="true"]:focus{outline:2px solid var(--brand);background:rgba(60,122,75,.05)}
+
+/* ====================== barra superior ====================== */
+.gpi-ed-bar{
+  position:fixed;top:0;left:0;right:0;z-index:200;
+  display:flex;align-items:center;gap:8px;flex-wrap:wrap;
+  background:#0E1A12;color:#EAF2EC;
+  padding:9px 14px;font-family:var(--sans);font-size:13px;
+  box-shadow:0 6px 24px -10px rgba(0,0,0,.6);
+}
+.gpi-ed-bar .ttl{font-weight:600;letter-spacing:-.01em;margin-right:6px;display:flex;align-items:center;gap:7px}
+.gpi-ed-bar .ttl .d{width:8px;height:8px;border-radius:50%;background:var(--brand);box-shadow:0 0 8px var(--brand)}
+.gpi-ed-bar .sp{flex:1}
+.gpi-ed-bar .nav{font-family:var(--mono);font-size:12px;color:#9FB3A6;min-width:64px;text-align:center}
+.gpi-ed-bar .paste-hint{font-family:var(--mono);font-size:10.5px;color:#7FA790;letter-spacing:.04em;margin-right:4px}
+
+.gpi-ed-btn{
+  font-family:var(--sans);font-size:12.5px;font-weight:500;
+  background:#1C3024;color:#EAF2EC;border:1px solid #2C4A38;border-radius:8px;
+  padding:6px 11px;cursor:pointer;white-space:nowrap;transition:background .12s,border-color .12s;
+}
+.gpi-ed-btn:hover{background:#264433;border-color:#3C7A4B}
+.gpi-ed-btn.pri{background:var(--brand);border-color:var(--brand);color:#fff}
+.gpi-ed-btn.pri:hover{background:#2E5E39}
+.gpi-ed-btn.gho{background:transparent}
+.gpi-ed-btn.danger{background:#3a1d1d;border-color:#5a2b2b;color:#ffd9d9}
+.gpi-ed-btn.danger:hover{background:#502828}
+.gpi-ed-sepv{width:1px;height:22px;background:#2C4A38;margin:0 2px}
+
+/* ====================== panel derecho ====================== */
+.gpi-ed-panel{
+  position:fixed;top:54px;right:14px;z-index:200;width:260px;
+  background:#0E1A12;color:#EAF2EC;border:1px solid #2C4A38;border-radius:12px;
+  padding:14px;font-family:var(--sans);font-size:13px;
+  box-shadow:0 18px 50px -20px rgba(0,0,0,.7);
+  display:none;
+}
+.gpi-ed-panel.show{display:block}
+.gpi-ed-panel h4{font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:#7FA790;font-family:var(--mono);font-weight:500;margin:0 0 10px}
+.gpi-ed-panel .grp{margin-bottom:12px}
+.gpi-ed-panel label{display:block;font-size:11px;color:#9FB3A6;margin-bottom:4px}
+.gpi-ed-panel input[type=text],
+.gpi-ed-panel textarea,
+.gpi-ed-panel select{
+  width:100%;background:#14241A;border:1px solid #2C4A38;border-radius:7px;
+  color:#EAF2EC;font-family:var(--sans);font-size:12.5px;padding:6px 8px;
+}
+.gpi-ed-panel textarea{resize:vertical;min-height:54px;line-height:1.4}
+.gpi-ed-panel .seg{display:flex;gap:4px;flex-wrap:wrap}
+.gpi-ed-panel .seg button{
+  flex:1;min-width:54px;font-size:11.5px;padding:5px 6px;border-radius:6px;cursor:pointer;
+  background:#14241A;border:1px solid #2C4A38;color:#cfe0d5;
+}
+.gpi-ed-panel .seg button.on{background:var(--brand);border-color:var(--brand);color:#fff}
+.gpi-ed-panel .seg button.on.red{background:var(--red);border-color:var(--red)}
+.gpi-ed-panel .seg button.on.yel{background:var(--warn);border-color:var(--warn)}
+.gpi-ed-panel .nums{display:grid;grid-template-columns:1fr 1fr;gap:6px}
+.gpi-ed-panel .nums label{margin:0}
+.gpi-ed-panel .nums input{width:100%}
+.gpi-ed-panel .hintln{font-size:11px;color:#7FA790;line-height:1.4;margin-top:6px}
+
+/* ====================== toast ====================== */
+.gpi-ed-toast{
+  position:fixed;bottom:18px;left:50%;transform:translateX(-50%) translateY(20px);
+  z-index:300;background:#0E1A12;color:#EAF2EC;border:1px solid #3C7A4B;
+  padding:10px 16px;border-radius:10px;font-family:var(--sans);font-size:13px;
+  box-shadow:0 16px 40px -16px rgba(0,0,0,.7);opacity:0;pointer-events:none;
+  transition:opacity .2s,transform .2s;max-width:80vw;text-align:center;
+}
+.gpi-ed-toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+
+/* barra de restauración (cambios sin guardar) */
+.gpi-ed-restore{
+  position:fixed;top:54px;left:50%;transform:translateX(-50%);z-index:210;
+  display:flex;align-items:center;gap:10px;
+  background:#3a2f12;color:#f3e6c4;border:1px solid #6b5417;border-radius:10px;
+  padding:9px 14px;font-family:var(--sans);font-size:13px;
+  box-shadow:0 16px 40px -16px rgba(0,0,0,.6);
+}
+.gpi-ed-restore .gpi-ed-btn{background:#4a3c16;border-color:#6b5417}
+.gpi-ed-restore .gpi-ed-btn.pri{background:var(--warn);border-color:var(--warn);color:#2a2208}
+
+/* input file oculto */
+.gpi-ed-file{position:absolute;width:1px;height:1px;opacity:0;overflow:hidden}
