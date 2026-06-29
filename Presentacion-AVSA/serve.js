@@ -70,8 +70,15 @@ const server = http.createServer((req, res)=>{
   });
 });
 
+// chequeo de cordura: ¿está la carpeta de demos donde esperamos?
+if(!fs.existsSync(path.join(ROOT, 'demos', 'index.html'))){
+  console.error('\n  ⚠ No encuentro "demos/index.html" en:\n    ' + ROOT +
+    '\n  Asegurate de que serve.js esté dentro de la carpeta "Presentacion-AVSA".\n');
+}
+
 server.listen(PORT, '0.0.0.0', ()=>{
   console.log('\n  GPI · editor de demos corriendo');
+  console.log('  Sirviendo:         ' + ROOT);
   console.log('  En ESTA compu:     http://localhost:' + PORT + '/demos/index.html');
   lanIPs().forEach(ip => console.log('  Desde otra compu:  http://' + ip + ':' + PORT + '/demos/index.html'));
   console.log('  (Ctrl+C para detener · firewall: permitir Node en la red local)\n');
