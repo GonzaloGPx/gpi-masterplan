@@ -1,0 +1,80 @@
+/* ============================================================
+   GPI · Mock navegable de la plataforma
+   Vistas a pantalla completa (captura grande) + sidebar con
+   módulos desplegables → pestañas. Navegación por clic o flechas.
+   Carga DESPUÉS de deck.css (reusa marca y estilos de recuadros).
+   ============================================================ */
+:root{ --gpi-navw:264px; }
+
+/* ---------- vista full-size ---------- */
+.scene{
+  position:absolute; inset:0; left:var(--gpi-navw);
+  opacity:0; visibility:hidden; transition:opacity .22s ease;
+  padding:0; text-align:initial;
+}
+.scene.active{ opacity:1; visibility:visible; }
+
+/* el frame ocupa TODO el área a la derecha del sidebar (full-bleed) */
+.frame{
+  position:absolute; inset:0; width:auto; max-width:none; max-height:none;
+  border:0; border-radius:0; box-shadow:none; overflow:hidden; line-height:0; background:#fff;
+}
+/* la captura se agranda al máximo llenando el área, sin recortar datos */
+.frame img{
+  display:block; width:100%; height:100%; object-fit:contain; max-width:none; max-height:none;
+}
+
+/* ---------- sidebar ---------- */
+.gpi-mock-nav{
+  position:fixed; top:0; left:0; bottom:0; width:var(--gpi-navw); z-index:55;
+  background:var(--surface); border-right:1px solid var(--line);
+  display:flex; flex-direction:column; padding:22px 14px 14px; overflow-y:auto;
+  font-family:var(--sans);
+}
+.gpi-mock-nav .brand{ display:flex; align-items:center; gap:10px; padding:2px 8px 18px; }
+.gpi-mock-nav .brand .dot{ width:11px;height:11px;border-radius:50%;background:var(--brand);
+  box-shadow:0 0 0 3px rgba(60,122,75,.16),0 0 10px rgba(60,122,75,.55); }
+.gpi-mock-nav .brand b{ font-weight:700; font-size:19px; color:var(--ink); }
+.gpi-mock-nav .sep{ height:1px; background:var(--line); margin:0 4px 12px; }
+
+.gpi-mock-nav .mod > .row{
+  display:flex; align-items:center; gap:11px; padding:10px 12px; border-radius:11px;
+  color:var(--mut); font-size:15px; font-weight:500; cursor:pointer; user-select:none;
+  transition:background .15s, color .15s;
+}
+.gpi-mock-nav .mod > .row:hover{ background:var(--surface-2); color:var(--ink); }
+.gpi-mock-nav .mod > .row .ico{ width:20px; height:20px; flex:0 0 20px; }
+.gpi-mock-nav .mod > .row .ico svg{ width:20px; height:20px; display:block; }
+.gpi-mock-nav .mod > .row .lbl{ flex:1; }
+.gpi-mock-nav .mod > .row .chev{ opacity:.5; font-size:11px; transition:transform .2s; }
+.gpi-mock-nav .mod.open > .row .chev{ transform:rotate(90deg); }
+.gpi-mock-nav .mod.active-mod > .row{ color:var(--ink); }
+.gpi-mock-nav .mod.direct.active > .row{ background:var(--brand); color:#fff; box-shadow:0 10px 22px -10px rgba(60,122,75,.55); }
+
+.gpi-mock-nav .tabs{ overflow:hidden; max-height:0; transition:max-height .24s ease; }
+.gpi-mock-nav .mod.open .tabs{ max-height:640px; }
+.gpi-mock-nav .tab{
+  display:flex; align-items:center; padding:8px 12px 8px 44px; border-radius:9px; margin-top:2px;
+  color:var(--mut); font-size:14px; cursor:pointer; transition:background .12s, color .12s;
+}
+.gpi-mock-nav .tab:hover{ background:var(--surface-2); color:var(--ink); }
+.gpi-mock-nav .tab.active{ background:var(--brand); color:#fff; }
+
+.gpi-mock-nav .spacer{ flex:1; min-height:14px; }
+.gpi-mock-nav .foot{ display:flex; align-items:center; gap:9px; padding:12px 8px 2px; border-top:1px solid var(--line); }
+.gpi-mock-nav .foot .av{ font-family:var(--mono); font-size:10px; letter-spacing:.14em; text-transform:uppercase; color:var(--soft); }
+.gpi-mock-nav .foot img{ height:20px; opacity:.9; }
+
+/* pista de navegación */
+.gpi-mock-hint{
+  position:fixed; right:18px; bottom:16px; z-index:54;
+  font-family:var(--mono); font-size:11px; color:var(--soft);
+  background:var(--surface); border:1px solid var(--line); border-radius:100px; padding:6px 13px;
+  box-shadow:0 8px 20px -12px rgba(10,10,10,.3);
+}
+
+/* en edición: el sidebar baja debajo de la barra del editor */
+body.gpi-edit .gpi-mock-nav{ top:46px; }
+body.gpi-edit .gpi-mock-hint{ display:none; }
+
+@media (max-width:820px){ :root{ --gpi-navw:208px; } }

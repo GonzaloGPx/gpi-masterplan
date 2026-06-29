@@ -57,7 +57,7 @@ const server = http.createServer((req, res)=>{
   }
 
   // --- estáticos ---
-  let webPath = u.pathname === '/' ? '/demos/index.html' : u.pathname;
+  let webPath = u.pathname === '/' ? '/demos/plataforma.html' : u.pathname;
   const fp = safe(webPath);
   if(!fp){ res.writeHead(403); res.end('prohibido'); return; }
   fs.readFile(fp, (err, data)=>{
@@ -79,7 +79,7 @@ if(!fs.existsSync(path.join(ROOT, 'demos', 'index.html'))){
 server.listen(PORT, '0.0.0.0', ()=>{
   console.log('\n  GPI · editor de demos corriendo');
   console.log('  Sirviendo:         ' + ROOT);
-  console.log('  En ESTA compu:     http://localhost:' + PORT + '/demos/index.html');
-  lanIPs().forEach(ip => console.log('  Desde otra compu:  http://' + ip + ':' + PORT + '/demos/index.html'));
+  console.log('  En ESTA compu:     http://localhost:' + PORT + '/demos/plataforma.html');
+  lanIPs().forEach(ip => console.log('  Desde otra compu:  http://' + ip + ':' + PORT + '/demos/plataforma.html'));
   console.log('  (Ctrl+C para detener · firewall: permitir Node en la red local)\n');
 });

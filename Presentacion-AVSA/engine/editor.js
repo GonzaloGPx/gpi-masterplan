@@ -184,6 +184,28 @@
     if(!lab){ lab = document.createElement('span'); lab.className = 'lab'; lab.textContent = txt||'Texto'; el.insertBefore(lab, el.firstChild); }
     return lab;
   }
+  // etiqueta de la viñeta (.ilab): se puede quitar y volver a crear escribiendo
+  function ensureIlab(el, txt){
+    let ilab = el.querySelector(':scope > .ilab');
+    if(!ilab){ ilab = document.createElement('span'); ilab.className = 'ilab'; ilab.textContent = txt||'Etiqueta';
+      ilab.setAttribute('contenteditable','true'); el.insertBefore(ilab, el.firstChild); }
+    return ilab;
+  }
+  // ids para vincular clickbox → viñeta (revelar al click)
+  function newRevealId(){
+    let max = 0;
+    document.querySelectorAll('[data-reveal-id]').forEach(n=>{ const m = /^r(\d+)$/.exec(n.dataset.revealId||''); if(m) max = Math.max(max, parseInt(m[1],10)); });
+    return 'r' + (max + 1);
+  }
+  function revealIdOf(ins){ if(!ins.dataset.revealId) ins.dataset.revealId = newRevealId(); return ins.dataset.revealId; }
+  function insetOptionsHTML(cb){
+    const insets = [...scenesList()[curIdx].querySelectorAll('.inset')];
+    return insets.map((ins,i)=>{
+      const lab = ((ins.querySelector(':scope > .ilab')||{}).textContent || '').trim() || ('Viñeta ' + (i+1));
+      const on = cb.dataset.reveal && ins.dataset.revealId === cb.dataset.reveal;
+      return '<option value="'+i+'"'+(on?' selected':'')+'>'+escAttr(lab)+'</option>';
+    }).join('');
+  }
   function setType(el, type){
     el.classList.remove('callout','callout--alert','callout--warn','clickbox');
     if(type === 'click'){
@@ -240,6 +262,11 @@
         <label>Posición del título</label>
         <select id="pPos">${LABPOS.map(([v,n])=>`<option value="${v}">${n}</option>`).join('')}</select>
       </div>
+      <div class="grp" id="pRevWrap" style="${t==='click'?'':'display:none'}">
+        <label>Al hacer click, mostrar/ocultar viñeta</label>
+        <select id="pRev"><option value="">— ninguna —</option>${insetOptionsHTML(el)}</select>
+        <div class="hintln">En la presentación esta caja se vuelve clickeable: muestra u oculta la viñeta elegida (arranca oculta). Agregá primero la viñeta con <b>+ Viñeta</b>.</div>
+      </div>
       <div class="grp"><label>Posición y tamaño (%)</label>
         <div class="nums">
           <div><label>Izq</label><input type="text" id="nL" value="${g.left.toFixed(1)}"></div>
@@ -264,6 +291,15 @@
     if(pPos) pPos.onchange = ()=>{ const l = labEl(); if(l) l.className = pPos.value; };
     const pLabDel = document.getElementById('pLabDel');
     if(pLabDel) pLabDel.onclick = ()=>{ const l = labEl(); if(l) l.remove(); if(pLab) pLab.value=''; toast('Título quitado · escribí en el campo para volver a ponerlo'); };
+    const pRev = document.getElementById('pRev');
+    if(pRev) pRev.onchange = ()=>{
+      if(pRev.value === ''){ el.removeAttribute('data-reveal'); el.classList.remove('clickbox--btn'); toast('Click desvinculado'); return; }
+      const ins = scenesList()[curIdx].querySelectorAll('.inset')[parseInt(pRev.value,10)];
+      if(!ins){ toast('No encuentro esa viñeta'); return; }
+      ins.classList.add('reveal');
+      el.dataset.reveal = revealIdOf(ins); el.classList.add('clickbox--btn');
+      toast('Listo · en la presentación, clickear esta caja muestra/oculta la viñeta');
+    };
     bindNums(el);
     document.getElementById('pDel').onclick = ()=>{ el.remove(); deselect(); };
     panel.classList.add('show');
@@ -276,7 +312,9 @@
     const wpx = Math.round(el.getBoundingClientRect().width);
     panel.innerHTML = `
       <h4>Viñeta lateral</h4>
-      <div class="grp"><label>Etiqueta</label><input type="text" id="iLab" value="${ilab?escAttr(ilab.textContent):''}"></div>
+      <div class="grp"><label>Etiqueta</label><input type="text" id="iLab" value="${ilab?escAttr(ilab.textContent):''}">
+        <button class="gpi-ed-btn gho" id="iLabDel" style="width:100%;margin-top:6px">Quitar etiqueta</button>
+      </div>
       <div class="grp"><label>Pegar al borde</label><div class="seg" id="iSide">
         <button data-s="lft" class="${side==='lft'?'on':''}">Izquierda</button>
         <button data-s="rgt" class="${side==='rgt'?'on':''}">Derecha</button>
@@ -289,7 +327,8 @@
       <div class="grp"><button class="gpi-ed-btn" id="iPhoto" style="width:100%">Cambiar foto de la viñeta</button></div>
       <div class="grp"><button class="gpi-ed-btn danger" id="iDel" style="width:100%">Borrar viñeta</button></div>
       <div class="hintln">Arrastrala libremente por toda la pantalla · esquina ▸ para el ancho · “Pegar al borde” la fija al costado.</div>`;
-    document.getElementById('iLab').oninput = e=>{ if(ilab) ilab.textContent = e.target.value; };
+    document.getElementById('iLab').oninput = e=>{ ensureIlab(el).textContent = e.target.value; };
+    document.getElementById('iLabDel').onclick = ()=>{ const l = el.querySelector(':scope > .ilab'); if(l) l.remove(); const inp = document.getElementById('iLab'); if(inp) inp.value=''; toast('Etiqueta quitada · escribí en el campo para volver a ponerla'); };
     document.getElementById('iSide').onclick = e=>{ const b = e.target.closest('button'); if(!b) return; el.classList.remove('lft','rgt'); el.classList.add(b.dataset.s); el.style.left=''; buildInsetPanel(el); };
     document.getElementById('iL').oninput = e=>{ const v = parseFloat(e.target.value); if(!isNaN(v)){ el.classList.remove('lft','rgt'); el.style.left = v+'%'; } readout(el); };
     document.getElementById('iW').oninput = e=>{ const v = parseFloat(e.target.value); if(!isNaN(v)) el.style.width = Math.max(140,v)+'px'; readout(el); };
@@ -493,6 +532,7 @@
     list[i].classList.add('active');
     curIdx = i; deselect(); updateNav();
     window.scrollTo({top:0});
+    if(window.__GPI_NAV_SYNC__) window.__GPI_NAV_SYNC__(i);   // sincroniza el sidebar del mock
   }
   function updateNav(){
     const n = document.getElementById('gpiEdNav');
@@ -515,7 +555,7 @@
     const c = scene.cloneNode(true);
     c.classList.remove('active','gpi-ed-sel');
     c.querySelectorAll('.gpi-ed-handle,.gpi-ed-readout').forEach(n=>n.remove());
-    c.querySelectorAll('.in,.active,.gpi-ed-sel').forEach(n=>n.classList.remove('in','active','gpi-ed-sel'));
+    c.querySelectorAll('.in,.active,.gpi-ed-sel,.is-on,.is-pressed').forEach(n=>n.classList.remove('in','active','gpi-ed-sel','is-on','is-pressed'));
     c.querySelectorAll('[contenteditable]').forEach(n=>n.removeAttribute('contenteditable'));
     c.querySelectorAll('img').forEach(img=>{ if(img.dataset.edExportSrc) img.setAttribute('src', img.dataset.edExportSrc); });
     c.querySelectorAll('*').forEach(n=>[...n.attributes].forEach(a=>{ if(a.name.indexOf('data-ed')===0) n.removeAttribute(a.name); }));
@@ -523,8 +563,9 @@
   }
   function buildDoc(){
     const scenes = scenesList().map(cleanScene).join('\n\n');
+    const loader = window.GPI_LOADER_SRC || '../engine/deck.js';   // mock.js o deck.js según la página
     return '<!DOCTYPE html><html lang="es"><head>\n'+cleanHead()+'\n</head>\n<body '+bodyAttrs()+'>\n\n'+
-           scenes+'\n\n<script src="../engine/deck.js"><\/script>\n</body></html>\n';
+           scenes+'\n\n<script src="'+loader+'"><\/script>\n</body></html>\n';
   }
   function download(){
     const blob = new Blob([buildDoc()], {type:'text/html'});
@@ -729,6 +770,12 @@
     toast('Saliste del editor');
   }
   window.addEventListener('gpi-edit-toggle', ()=>{ editing ? exitEdit() : enterEdit(); });
+
+  // cuando el sidebar del mock cambia de vista, alinear el índice del editor
+  window.__GPI_EDITOR_SYNC__ = function(i){
+    if(i < 0 || i >= scenesList().length) return;
+    curIdx = i; deselect(); updateNav();
+  };
 
   enterEdit(); // al cargarse por primera vez, entra directo
 })();

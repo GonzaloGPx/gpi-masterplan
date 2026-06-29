@@ -171,6 +171,17 @@ h1{font-family:var(--sans);font-weight:600;letter-spacing:-.02em;line-height:1.0
 }
 .conn::after{content:"";position:absolute;right:-3px;top:-4px;width:7px;height:7px;border-radius:50%;background:var(--brand)}
 
+/* .clickbox--btn: clickbox interactivo. En la presentación se puede clickear para
+   mostrar/ocultar una viñeta vinculada (data-reveal ↔ inset[data-reveal-id]). */
+.clickbox--btn{pointer-events:auto;cursor:pointer}
+.clickbox--btn:hover{box-shadow:0 0 0 5px rgba(60,122,75,.22)}
+.clickbox--btn.is-pressed{background:rgba(60,122,75,.16)}
+/* viñeta revelable: oculta hasta que se hace click en su clickbox */
+.stage .inset.reveal{display:none}
+.stage .inset.reveal.is-on{display:block}
+/* en edición siempre visible para poder acomodarla */
+body.gpi-edit .stage .inset.reveal{display:block !important}
+
 /* ---------- brand chrome (inyectado por deck.js) ---------- */
 .brandbar{
   position:fixed;top:24px;left:30px;z-index:30;display:flex;align-items:center;gap:12px;

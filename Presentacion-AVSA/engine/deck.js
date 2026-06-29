@@ -66,6 +66,9 @@
     const s = scenes[i];
     s.classList.add('active');
     s.querySelectorAll('[data-anim]').forEach((e,k) => setTimeout(() => e.classList.add('in'), 90 + 85*k));
+    // viñetas revelables: ocultas al entrar a la escena
+    s.querySelectorAll('.inset.reveal.is-on').forEach(v => v.classList.remove('is-on'));
+    s.querySelectorAll('.clickbox--btn.is-pressed').forEach(c => c.classList.remove('is-pressed'));
     counter.textContent = String(i+1).padStart(2,'0') + ' / ' + String(scenes.length).padStart(2,'0');
     acc = 0; t0 = performance.now();
   }
@@ -99,6 +102,15 @@
     else if(e.code === 'ArrowRight'){ e.preventDefault(); next(); }
     else if(e.code === 'ArrowLeft'){ e.preventDefault(); prev(); }
     else if(e.code === 'Home'){ e.preventDefault(); enter(0); if(playing) play(); }
+  });
+
+  /* ---- click → revela/oculta la viñeta vinculada (presentación) ---- */
+  document.addEventListener('click', e => {
+    if(editMode) return;
+    const cb = e.target.closest('.clickbox--btn[data-reveal]'); if(!cb) return;
+    const scene = cb.closest('.scene'); if(!scene) return;
+    scene.querySelectorAll('.inset[data-reveal-id="'+cb.dataset.reveal+'"]').forEach(v => v.classList.toggle('is-on'));
+    cb.classList.toggle('is-pressed');
   });
 
   /* ---- API pública (la usa el editor) ---- */

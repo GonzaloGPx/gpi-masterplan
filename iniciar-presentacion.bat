@@ -10,4 +10,4 @@ if not exist "serve.js" (
 )
 start "GPI editor server" cmd /k node serve.js
 timeout /t 1 >nul
-start "" http://localhost:8123/demos/index.html
+start "" http://localhost:8123/demos/plataforma.html
